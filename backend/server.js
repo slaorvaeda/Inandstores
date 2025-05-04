@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken")
 const mongoose = require("mongoose")
 const path = require("path")
 const dotenv = require("dotenv")
+const  user = require("./Schema/Newuser")
+const bcrypt = require("bcrypt")
 
 const route = require("./Routes/route")
 
@@ -75,6 +77,8 @@ const verifyToken = (req, res, next) => {
 // app.get("/api/data", (req, res) => {
 //   res.json({ data: "This is some data from the backend" })
 // })
+
+
 
 // Start the server
 app.listen(PORT, () => {
