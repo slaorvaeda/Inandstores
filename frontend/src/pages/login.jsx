@@ -1,17 +1,18 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import useRedirectIfAuthenticated from "../hooks/useRedirectIfAuthenticated"; 
+import { useAuth } from "../assets/AuthContext";
+import useRedirectIfAuthenticated from "../hooks/useRedirectIfAuthenticated";
 
 const Login = () => {
   useRedirectIfAuthenticated();
 
-  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,17 +23,15 @@ const Login = () => {
         password,
       });
 
+      // console.log("Response:", response);
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("userId", response.data.user.id);
+      
+      login();
       setSuccess("Login successful!");
       setError("");
-      console.log("Token:", response.data.token);
-
-      // ✅ Save token (optional)
-      localStorage.setItem("token", response.data.token);
-
-      // ✅ Redirect to dashboard after 1 second
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 1000);
+      navigate("/dashboard");
+      
     } catch (err) {
       console.error("Error:", err);
       setError(err.response?.data?.message || "Something went wrong!");

@@ -3,7 +3,16 @@ const jwt = require("jsonwebtoken");
 const User = require("../Schema/Newuser");
 const router = express.Router();
 const dotenv = require("dotenv");
+const invoiceController = require('../controllers/invoiceController');
+const clientController = require('../controllers/clientController');
+const Invoice = require('../Schema/Invoice.model');
+
 dotenv.config();
+
+// Ensure JWT_SECRET is defined
+if (!process.env.JWT_SECRET) {
+  throw new Error("JWT_SECRET is not defined in the .env file");
+}
 
 // Welcome route
 router.get("/", (req, res) => {
@@ -35,7 +44,7 @@ router.post("/signup", async (req, res) => {
 
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {
-    console.error("Error during signup:", error);
+    console.error("Error during signup:", error.message);
     res.status(500).json({ message: "Internal server error" });
   }
 });
@@ -76,9 +85,54 @@ router.post("/login", async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error during login:", error);
+    console.error("Error during login:", error.message);
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+
+
+// Get user avatar
+router.get("/avatar/:userId", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      avatar: user.avatar || "https://via.placeholder.com/40", // Default avatar if not set
+      name: user.name || "User", // Default name if not set
+    });
+  } catch (err) {
+    console.error("Error fetching user data:", err.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
+router.post('/invoices', invoiceController.createInvoice);
+
+router.get('/invoices/:id', async (req, res) => {
+  try {
+    const invoice = await Invoice.findById(req.params.id).populate('client'); // Replace with your DB query
+    if (!invoice) return res.status(404).json({ error: 'Invoice not found' });
+    res.json(invoice);
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.get('/invoices', invoiceController.getAllInvoices);
+
+
+router.post('/', clientController.createClient); // Create a new client
+router.get('/clients', clientController.getClients); // Get all clients
+router.get('/clients/:id', clientController.getClientById); // Get a client by ID
+router.put('/clients/:id', clientController.updateClient); // Update a client by ID
+router.delete('/clients/:id', clientController.deleteClient); // Delete a client by ID
+
+
 
 module.exports = router;

@@ -4,6 +4,12 @@ import Login from '../pages/login'
 import Signup from '../pages/signup'
 import Dashboard from '../pages/Dashboard'
 import Home from '../pages/Home'
+import Pai from '../components/Pai'
+import Sai from '../components/Sai'
+import Notfound from '../pages/Notfound'
+import ClientAdd from '../components/Clientadd'
+import InvoiceList from '../components/InvoiceList'
+import InvoiceView from '../components/InvoiceView'
 
 const router = createBrowserRouter([
     {
@@ -15,19 +21,44 @@ const router = createBrowserRouter([
                 element: <Home />
             },
             {
-                path: '/login',
+                path: 'login',
                 element: <Login />
             },
             {
-                path: '/signup',
+                path: 'signup',
                 element: <Signup />
             },
             {
-                path: '/dashboard',
-                element: <Dashboard />
+                path: 'dashboard',
+                element: <Dashboard />,
+                children: [
+                    {
+                        path: 'pai',
+                        element: <Pai />
+                    },
+                    {
+                        path: 'sai',
+                        element: <Sai />
+                    },
+                    {
+                        path: 'client',
+                        element: <ClientAdd />
+                    },
+                    {
+                        path: 'invoice',
+                        element: <InvoiceList />
+                    },{
+                        path: 'invoice/:invoiceId',
+                        element: <InvoiceView />
+                    }
+                ]
             }
-        ]
+        ],
+    },
+    {
+        path: '*',
+        element: <Notfound />
     }
 ]);
 
-export default router
+export default router;
