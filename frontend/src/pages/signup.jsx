@@ -32,7 +32,7 @@ const Signup = () => {
       });
       setSuccess("Signup successful! Please log in.");
       setError("");
-      console.log("Response:", response.data);
+      // console.log("Response:", response.data);
     } catch (err) {
       console.error("Error:", err);
       setError(err.response?.data?.message || "Something went wrong!");
