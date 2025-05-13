@@ -1,5 +1,5 @@
 import React from 'react'
-import InvoiceList from './InvoiceList'
+import InvoiceList from './Invoice/InvoiceList'
 
 function Sai() {
   return (

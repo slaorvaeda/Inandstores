@@ -14,7 +14,11 @@ import {
   FaCalendarAlt,
   FaBars,
   FaSignOutAlt,
+  FaShoppingBasket,
+  FaShoppingBag
 } from 'react-icons/fa';
+import { FaShop } from "react-icons/fa6";
+
 import axios from 'axios';
 import { useAuth } from '../assets/AuthContext';
 
@@ -55,7 +59,7 @@ function SideBar() {
     `text-gray-400 no-underline ${isActive ? 'bg-slate-700' : ''}`;
 
   return (
-    <Sidebar backgroundColor="#1e293b" style={{ height: '100vh' }}>
+    <Sidebar backgroundColor="#1e293b" style={{ height: '90vh' }}>
       <div className="flex items-center justify-between px-4 p-2 text-yellow-400">
         {!collapsed && 
         <Link to='/dashboard'><h2 className="text-lg font-bold">Dashboard</h2></Link>}
@@ -65,6 +69,21 @@ function SideBar() {
       </div>
 
       <Menu iconShape="circle">
+      <SubMenu label="Items" icon={<FaShoppingBag />} className="text-gray-400">
+          <MenuItem
+            icon={<FaShoppingBasket />}
+            component={<NavLink to="/dashboard/item/newitem" className={linkClass} />}
+          >
+            NewItems
+          </MenuItem>
+          <MenuItem
+            icon={<FaShop />}
+            component={<NavLink to="/dashboard/item/list" className={linkClass} />}
+          >
+            Inventory Items
+          </MenuItem>
+        </SubMenu>
+        
         <SubMenu label="Charts" icon={<FaChartPie />} className="text-gray-400">
           <MenuItem
             icon={<FaChartPie />}
@@ -82,14 +101,14 @@ function SideBar() {
 
         <MenuItem
           icon={<FaBook />}
-          component={<NavLink to="/dashboard/documentation" className={linkClass} />}
+          component={<NavLink to="/dashboard/client" className={linkClass} />}
         >
           Documentation
         </MenuItem>
 
         <MenuItem
           icon={<FaCalendarAlt />}
-          component={<NavLink to="/dashboard/client" className={linkClass} />}
+          component={<NavLink to="/dashboard/client/add" className={linkClass} />}
         >
           Calendar
         </MenuItem>

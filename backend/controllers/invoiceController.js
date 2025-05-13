@@ -17,7 +17,7 @@ exports.getInvoices = async (req, res) => {
 
 exports.getAllInvoices =  async (req, res) => {
   try {
-    const invoices = await Invoice.find(); // Adjust based on your schema
+    const invoices = await Invoice.find(); 
     res.json({invoices});
   } catch (error) {
     console.error('Error fetching invoices:', error.message);

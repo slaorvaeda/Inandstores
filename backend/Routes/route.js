@@ -6,6 +6,8 @@ const dotenv = require("dotenv");
 const invoiceController = require('../controllers/invoiceController');
 const clientController = require('../controllers/clientController');
 const Invoice = require('../Schema/Invoice.model');
+const userRoutes = require("./userRoutes");
+const verifyToken = require("../middleware/auth"); // Middleware to verify JWT
 
 dotenv.config();
 
@@ -127,11 +129,63 @@ router.get('/invoices/:id', async (req, res) => {
 router.get('/invoices', invoiceController.getAllInvoices);
 
 
+router.delete('/invoices/:id', async (req, res) => {
+  try {
+    const deletedInvoice = await Invoice.findByIdAndDelete(req.params.id);
+
+    if (!deletedInvoice) return res.status(404).json({ error: 'Invoice not found' });
+    res.json({ message: 'Invoice deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting invoice:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 router.post('/', clientController.createClient); // Create a new client
 router.get('/clients', clientController.getClients); // Get all clients
 router.get('/clients/:id', clientController.getClientById); // Get a client by ID
 router.put('/clients/:id', clientController.updateClient); // Update a client by ID
 router.delete('/clients/:id', clientController.deleteClient); // Delete a client by ID
+
+
+
+
+router.get('/user/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+
+router.put('/user/update/:id', async (req, res) => {
+  try {
+    const { name, password, avatar } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (name) user.name = name;
+    if (avatar) user.avatar = avatar;
+    if (password) user.password = await bcrypt.hash(password, 10);
+
+    await user.save();
+
+    res.json({
+      name: user.name,
+      avatar: user.avatar,
+      email: user.email
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Update failed', error: err.message });
+  }
+});
+
+
+
 
 
 
