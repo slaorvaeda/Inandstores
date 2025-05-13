@@ -10,6 +10,7 @@ const route = require("./Routes/route")
 const dbConfig = require("./config/db.config")
 const ApiError = require("./utils/ApiError")
 const clientRoutes = require("./Routes/clientRoutes")
+const itemRoutes = require("./Routes/itemRoutes")
 const ErrorHandler = require("./middleware/ErrorHandler")
 
 dotenv.config()
@@ -26,6 +27,8 @@ app.use(express.static("public")) // Serve static files
 // Routes
 app.use(route)
 app.use('/api/clients',clientRoutes )
+app.use('/api/items', itemRoutes);
+
 
 // JWT secret key
 const JWT_SECRET = process.env.JWT_SECRET
@@ -34,7 +37,7 @@ if (!JWT_SECRET) {
   process.exit(1)
 }
 
-// Middleware to verify JWT token
+// Middleware 
 const verifyToken = (req, res, next) => {
   const token = req.headers["authorization"]
   if (!token) {

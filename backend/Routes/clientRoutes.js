@@ -12,7 +12,7 @@ router.get('/', clientController.getClients);
 router.get('/:id', clientController.getClientById);
 
 // Route to update a client by ID
-router.put('/:id', clientController.updateClient);
+router.put('/update/:id', clientController.updateClient);
 
 // Route to delete a client by ID
 router.delete('/:id', clientController.deleteClient);

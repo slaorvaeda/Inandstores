@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import axios from 'axios';
+import { MdDelete } from "react-icons/md";
 
 const Pai = () => {
   const [clients, setClients] = useState([]);
@@ -152,19 +153,28 @@ const Pai = () => {
 
       <div>
         <h3 className="font-semibold mb-2">Items</h3>
+        {/* headers */}
+        <div className="flex gap-1 m-2">
+          <div className="w-80 font-semibold">Item Name</div>
+          <div className="w-20 font-semibold">Qty</div>
+          <div className="w-20 font-semibold">Rate</div>
+          <div className="w-20 font-semibold">Tax %</div>
+          <div className="w-40 font-semibold text-center">Total
+          </div>
+          </div>
         {fields.map((field, index) => {
           const quantity = watchedItems[index]?.quantity || 0;
           const rate = watchedItems[index]?.rate || 0;
           const totalPrice = (quantity * rate).toFixed(2);
 
           return (
-            <div key={field.id} className="grid grid-cols-6 gap-2 mb-2">
-              <input {...register(`items.${index}.itemName`)} placeholder="Item Name" className="border p-2" />
-              <input {...register(`items.${index}.quantity`)} type="number" placeholder="Qty" className="border p-2" />
-              <input {...register(`items.${index}.rate`)} type="number" placeholder="Rate" className="border p-2" />
-              <input {...register(`items.${index}.taxRate`)} type="number" placeholder="Tax %" className="border p-2" />
-              <div className="flex items-center justify-center text-sm font-semibold">₹{totalPrice}</div>
-              <button type="button" onClick={() => remove(index)} className="bg-red-500 text-white px-2 rounded">X</button>
+            <div key={field.id} className="flex gap-1 m-2">
+              <input {...register(`items.${index}.itemName`)} placeholder="Item Name" className="border p-2 w-80" />
+              <input {...register(`items.${index}.quantity`)} type="number" placeholder="Qty" className="border p-1 w-20 text-sm rounded-md" />
+              <input {...register(`items.${index}.rate`)} type="number" placeholder="Rate" className="border p-1 w-20 text-sm rounded-md" />
+              <input {...register(`items.${index}.taxRate`)} type="number" placeholder="Tax %" className="border p-1 w-20 text-sm rounded-md" />
+              <div className="flex items-center justify-center text-sm font-semibold w-40">₹{totalPrice}</div>
+              <button type="button" onClick={() => remove(index)} className="cursor-pointer text-red-500"><MdDelete /></button>
             </div>
           );
         })}
