@@ -11,6 +11,8 @@ const dbConfig = require("./config/db.config")
 const ApiError = require("./utils/ApiError")
 const clientRoutes = require("./Routes/clientRoutes")
 const itemRoutes = require("./Routes/itemRoutes")
+const vendorRoutes = require("./Routes/vendorRoutes")
+const purchaseBillRoutes = require("./Routes/purchaseBillRoutes")
 const ErrorHandler = require("./middleware/ErrorHandler")
 
 dotenv.config()
@@ -28,6 +30,9 @@ app.use(express.static("public")) // Serve static files
 app.use(route)
 app.use('/api/clients',clientRoutes )
 app.use('/api/items', itemRoutes);
+app.use('/api/vendors', vendorRoutes);
+
+app.use('/api/purchasebills', purchaseBillRoutes);
 
 
 // JWT secret key
@@ -36,7 +41,7 @@ if (!JWT_SECRET) {
   console.error("JWT_SECRET is not defined in .env file")
   process.exit(1)
 }
-
+  
 // Middleware 
 const verifyToken = (req, res, next) => {
   const token = req.headers["authorization"]
