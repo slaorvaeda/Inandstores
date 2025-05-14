@@ -39,12 +39,18 @@ const ClientList = () => {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <h2 className="text-3xl font-bold text-gray-800 mb-6">Client List</h2>
-
-      <div className="overflow-x-auto rounded-lg shadow-md">
-        <table className="min-w-full text-left text-sm border border-gray-300 bg-white">
-          <thead className="bg-gray-100 text-gray-700 font-semibold">
+    <div className="p-4 mx-auto">
+           <div className="flex bg-gray-300 rounded-sm justify-between items-center p-4 my-2">
+        <h2 className="text-2xl font-bold text-center">Client List</h2>
+        <button
+          onClick={() => navigate("add")}
+          className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 cursor-pointer" >
+            <span className=" text-center pr-1  ">+</span>New
+        </button>
+      </div>
+      <div className="overflow-x-auto rounded-lg ">
+        <table border = "0" className="min-w-full text-left text-sm border-none bg-white ">
+          <thead className="bg-gray-200 text-gray-700 font-semibold">
             <tr>
               <th className="px-6 py-3 border-b">Name</th>
               <th className="px-6 py-3 border-b">GST Number</th>
@@ -55,7 +61,7 @@ const ClientList = () => {
           </thead>
           <tbody className="text-gray-700">
             {clients.map((client) => (
-              <tr key={client._id} className="hover:bg-gray-50">
+              <tr key={client._id} className="hover:bg-gray-50 border-b-0 cursor-pointer ">
                 <td className="px-6 py-4 border-b">{client.name}</td>
                 <td className="px-6 py-4 border-b">{client.gstNumber || 'N/A'}</td>
                 <td className="px-6 py-4 border-b">{client.contact?.email || 'N/A'}</td>
@@ -64,15 +70,15 @@ const ClientList = () => {
                   <div className="flex justify-center gap-2">
                     <button
                       onClick={() => navigate(`edit-client/${client._id}`)}
-                      className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs"
+                      className="flex items-center gap-1  px-3 py-1 "
                     >
-                      <MdEdit /> Edit
+                      <MdEdit className='text-blue-500 hover:text-blue-600 text-xl cursor-pointer '/> 
                     </button>
                     <button
                       onClick={() => handleDelete(client._id)}
-                      className="flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs"
+                      className="flex items-center gap-1 px-3 py-1 "
                     >
-                      <MdDelete /> Delete
+                      <MdDelete className= 'text-red-500 hover:text-red-600 text-xl cursor-pointer' /> 
                     </button>
                   </div>
                 </td>

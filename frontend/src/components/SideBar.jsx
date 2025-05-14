@@ -18,15 +18,19 @@ import {
   FaShoppingBag
 } from 'react-icons/fa';
 import { FaShop } from "react-icons/fa6";
-
+import { BsPersonBadgeFill } from "react-icons/bs";
+import { IoIosPerson } from "react-icons/io";
+import { IoCartOutline } from "react-icons/io5";
+import { LuShoppingBag } from "react-icons/lu";
+import { TbInvoice } from "react-icons/tb";
 import axios from 'axios';
 import { useAuth } from '../assets/AuthContext';
 
 function SideBar() {
   const { collapseSidebar, collapsed } = useProSidebar();
-  const [avatar, setAvatar] = useState("https://via.placeholder.com/40"); 
+  const [avatar, setAvatar] = useState("https://via.placeholder.com/40");
   const [userName, setUserName] = useState("User");
-  const { logout } = useAuth(); 
+  const { logout } = useAuth();
   const navigate = useNavigate();
 
 
@@ -56,59 +60,80 @@ function SideBar() {
 
 
   const linkClass = ({ isActive }) =>
-    `text-gray-400 no-underline ${isActive ? 'bg-slate-700' : ''}`;
+    `text-gray-300 no-underline ${isActive ? 'bg-slate-700' : ''}`;
 
   return (
-    <Sidebar backgroundColor="#1e293b" style={{ height: '90vh' }}>
-      <div className="flex items-center justify-between px-4 p-2 text-yellow-400">
-        {!collapsed && 
-        <Link to='/dashboard'><h2 className="text-lg font-bold">Dashboard</h2></Link>}
-        <button onClick={() => collapseSidebar()} className="text-gray-400 pl-3">
-          <FaBars  className='text-xl'/>
+    <Sidebar backgroundColor="#1e293b" style={{ height: '90vh' }} rootStyles={{
+      color: '#f6f6f6',
+    }}>
+      <div className="flex items-center justify-between px-4 p-2 text-yellow-400 ">
+        {!collapsed &&
+          <Link to='/dashboard'><h2 className="text-lg font-bold">Dashboard</h2></Link>}
+        <button onClick={() => collapseSidebar()} className="text-gray-300 hover:text-gray-700 pl-3">
+          <FaBars className='text-xl cursor-pointer' />
         </button>
       </div>
 
-      <Menu iconShape="circle">
-      <SubMenu label="Items" icon={<FaShoppingBag />} className="text-gray-400">
+      <Menu iconShape="circle" >
+        <SubMenu label="Items" icon={<FaShoppingBag />} className="text-gray-300 hover:text-gray-700 ">
           <MenuItem
-            icon={<FaShoppingBasket />}
+            icon={<FaShoppingBasket />} className='text-gray-700'
             component={<NavLink to="/dashboard/item/newitem" className={linkClass} />}
           >
             NewItems
           </MenuItem>
           <MenuItem
-            icon={<FaShop />}
+            icon={<FaShop />} className='text-gray-700'
             component={<NavLink to="/dashboard/item/list" className={linkClass} />}
           >
             Inventory Items
           </MenuItem>
         </SubMenu>
-        
-        <SubMenu label="Charts" icon={<FaChartPie />} className="text-gray-400">
+
+        <SubMenu label="Sales" icon={<IoCartOutline />} className="text-gray-300 hover:text-gray-700">
           <MenuItem
-            icon={<FaChartPie />}
-            component={<NavLink to="/dashboard/pai" className={linkClass} />}
+            icon={<IoIosPerson />} className='text-gray-700'
+            component={<NavLink to="/dashboard/client" className={linkClass} />}
           >
-            Pie Charts
+            Customers
           </MenuItem>
           <MenuItem
-            icon={<FaChartLine />}
+            icon={<FaChartLine />} className='text-gray-700'
             component={<NavLink to="/dashboard/invoice" className={linkClass} />}
           >
-            Line Charts
+            Invoices
           </MenuItem>
+
+        </SubMenu>
+
+        <SubMenu label="Purchases" icon={<LuShoppingBag />} className="text-gray-300 hover:text-gray-700">
+          <MenuItem
+            icon={<BsPersonBadgeFill />} className='text-gray-700'
+            component={<NavLink to="/dashboard/vendor" className={linkClass} />}
+          >
+            Vender
+          </MenuItem>
+          <MenuItem
+            icon={<TbInvoice />} className='text-gray-700'
+            component={<NavLink to="/dashboard/PurchaseBill" className={linkClass} />}
+          >
+            Bill
+          </MenuItem>
+
+
+
         </SubMenu>
 
         <MenuItem
           icon={<FaBook />}
-          component={<NavLink to="/dashboard/client" className={linkClass} />}
+          component={<NavLink to="/dashboard/PurchaseBill/" className={linkClass} />}
         >
           Documentation
         </MenuItem>
 
         <MenuItem
           icon={<FaCalendarAlt />}
-          component={<NavLink to="/dashboard/client/add" className={linkClass} />}
+          component={<NavLink to="/dashboard/PurchaseBill/edit/:id" className={linkClass} />}
         >
           Calendar
         </MenuItem>

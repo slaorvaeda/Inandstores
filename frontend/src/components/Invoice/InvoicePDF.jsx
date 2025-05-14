@@ -15,13 +15,14 @@ const styles = StyleSheet.create({
     fontFamily: 'Helvetica',
     color: '#000',
     width: '100%',
-    border: '1px solid #ccc',
+    border: '1 solid #ccc',
   },
   heading: {
     width: '100%',
     fontSize: 16,
     textAlign: 'center',
     fontWeight: 'bold',
+    marginTop: 10,
     marginBottom: 5,
   },
   subheading: {
@@ -66,8 +67,9 @@ const styles = StyleSheet.create({
 });
 
 const InvoicePDF = ({ invoice }) => (
-  <Document>
+  <Document className="border border-black p-2">
     <Page size="A4" style={styles.page}>
+      
       <Text style={styles.heading} >RAGHUNATH TRADERS</Text>
       <Text style={styles.subheading}>
         Raghunathtraders, Hirli, Near Firestation, Nabarangapur, Odisha - 764059 | GSTIN: 21BEWPN1437B1ZQ

@@ -44,31 +44,35 @@ const UserProfile = () => {
 
   if (!user) return <div>Loading...</div>;
 
-  return (
-    <div className="max-w-lg mx-auto p-6 bg-white rounded shadow">
-      <h2 className="text-2xl font-bold mb-4">User Profile</h2>
-      <img src={user.avatar || 'https://via.placeholder.com/150'} alt="Avatar" className="w-24 h-24 rounded-full mb-4" />
-      <form onSubmit={handleUpdate} className="space-y-4">
+  return (<>
+
+    <h2 className=" container m-auto my-2 mt-6 p-3 rounded-sm text-2xl font-bold bg-gray-200 shadow-md">User Profile</h2>
+    <div className="flex container mx-auto p-6 bg-gray-100 rounded shadow-md">
+      <div className="flex-1/2">
+      <img src={user.avatar || 'https://via.placeholder.com/150'} alt="Avatar" className="w-50 h-50 m-auto rounded-full mb-4" />
+      </div>
+      <form onSubmit={handleUpdate} className="space-y-4 flex-3/4">
         <div>
           <label className="block font-medium mb-1">Name:</label>
           <input type="text" name="name" value={formData.name} onChange={handleChange}
-                 className="w-full px-3 py-2 border rounded" />
+            className=" px-3 py-2 rounded bg-white" />
         </div>
         <div>
           <label className="block font-medium mb-1">Password:</label>
           <input type="password" name="password" value={formData.password} onChange={handleChange}
-                 className="w-full px-3 py-2 border rounded" />
+            className=" px-3 py-2 rounded bg-white" />
         </div>
         <div>
           <label className="block font-medium mb-1">Avatar URL:</label>
           <input type="text" name="avatar" value={formData.avatar} onChange={handleChange}
-                 className="w-full px-3 py-2 border rounded" />
+            className="w-full px-3 py-2 rounded bg-white" />
         </div>
         <button type="submit" className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
           Update Profile
         </button>
       </form>
     </div>
+  </>
   );
 };
 

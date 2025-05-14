@@ -18,7 +18,7 @@ const ItemList = () => {
       try {
         const response = await axios.get(`http://localhost:4000/api/items?userId=${userId}`);
         setItems(response.data);
-        console.log("Fetched items:", response.data);
+        // console.log("Fetched items:", response.data);
       } catch (err) {
         console.error("Error fetching items:", err);
       } finally {
@@ -44,15 +44,13 @@ const ItemList = () => {
     alert(JSON.stringify(item, null, 2)); // You can replace this with a modal
   };
 
-  const handleEdit = (id) => {
-    console.log("Edit item:", id);
-  };
+
 
   if (loading) return <p className="text-center text-gray-500">Loading items...</p>;
 
   return (
     <div className="container mx-auto p-4">
-      <div className="flex bg-gray-300 rounded-sm justify-between items-center p-4">
+      <div className="flex bg-gray-300 rounded-sm justify-between items-center p-4 my-2">
         <h2 className="text-2xl font-bold text-center">Item List</h2>
         <button
           onClick={() => navigate("newitem")}
@@ -66,7 +64,7 @@ const ItemList = () => {
         <p className="text-center text-gray-500">No items found.</p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+          <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md ">
             <thead>
               <tr className="bg-gray-100 text-gray-700">
                 <th className="px-4 py-2 text-left">Name</th>
@@ -84,7 +82,7 @@ const ItemList = () => {
                 <tr
                   key={item._id}
                   className={`${index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                    } hover:bg-gray-100`}
+                    } hover:bg-gray-100 `}
                 >
                   <td className="px-4 py-2">{item.name}</td>
                   <td className="px-4 py-2">{item.sku}</td>
@@ -102,7 +100,7 @@ const ItemList = () => {
 
                     </button>
                     <button
-                      onClick={() => handleEdit(item._id)}
+                      onClick={() => navigate(`edit/${item._id}`)}
                       className="text-white px-3 py-1 rounded-md mr-2"
                     >
                      <CiEdit className="text-yellow-500 hover:text-yellow-600 text-xl cursor-pointer"/>
