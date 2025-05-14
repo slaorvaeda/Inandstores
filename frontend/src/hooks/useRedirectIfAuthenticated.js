@@ -9,15 +9,15 @@ const useRedirectIfAuthenticated = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    console.log("Token in useRedirectIfAuthenticated:", token);
-    console.log("Current path:", location.pathname);
+    // console.log("Token in useRedirectIfAuthenticated:", token);
+    // console.log("Current path:", location.pathname);
 
-    // Redirect only if the user is authenticated and not already on the dashboard
+    
     if (token && location.pathname !== "/dashboard") {
       console.log("Redirecting to /dashboard...");
       navigate("/dashboard");
     }
-  }, [navigate, location.pathname, isAuthenticated]); // Add location.pathname and isAuthenticated to the dependency array
+  }, [navigate, location.pathname, isAuthenticated]); 
 };
 
 export default useRedirectIfAuthenticated;

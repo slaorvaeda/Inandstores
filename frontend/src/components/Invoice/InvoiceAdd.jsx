@@ -3,7 +3,7 @@ import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import axios from 'axios';
 import { MdDelete } from "react-icons/md";
 
-const Pai = () => {
+const InvoiceAdd = () => {
   const [clients, setClients] = useState([]);
   const { register, handleSubmit, control, reset, setValue } = useForm({
     defaultValues: {
@@ -210,4 +210,4 @@ const Pai = () => {
   );
 };
 
-export default Pai;
+export default InvoiceAdd;
