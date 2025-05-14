@@ -7,6 +7,7 @@ const invoiceController = require('../controllers/invoiceController');
 const clientController = require('../controllers/clientController');
 const Invoice = require('../Schema/Invoice.model');
 const userRoutes = require("./userRoutes");
+const Vender = require("../Schema/Vender.model");
 const verifyToken = require("../middleware/auth"); // Middleware to verify JWT
 
 dotenv.config();
@@ -181,6 +182,17 @@ router.put('/user/update/:id', async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ message: 'Update failed', error: err.message });
+  }
+});
+
+
+router.put('/:id', async (req, res) => {
+  try {
+    const updatedItem = await Item.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updatedItem) return res.status(404).json({ error: 'Item not found' });
+    res.json(updatedItem);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update item' });
   }
 });
 
