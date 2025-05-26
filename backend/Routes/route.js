@@ -74,7 +74,7 @@ router.post("/login", async (req, res) => {
     const token = jwt.sign(
       { id: user._id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1d" }
     );
 
     res.status(200).json({
@@ -128,6 +128,16 @@ router.get('/invoices/:id', async (req, res) => {
 });
 
 router.get('/invoices', invoiceController.getAllInvoices);
+router.put('/invoices/:id', async (req, res) => {
+  try {
+    const updatedInvoice = await Invoice.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updatedInvoice) return res.status(404).json({ error: 'Invoice not found' });
+    res.json(updatedInvoice);
+  } catch (err) {
+    console.error('Error updating invoice:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 
 router.delete('/invoices/:id', async (req, res) => {

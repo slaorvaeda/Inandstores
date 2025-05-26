@@ -40,6 +40,8 @@ function PurchaseBillEdit() {
 
         setBillData(billRes.data);
         setVendors(vendorsRes.data);
+        console.log(billRes.data);
+        console.log(vendorsRes.data);
       } catch (err) {
         console.error("Error loading bill or vendors:", err);
       } finally {

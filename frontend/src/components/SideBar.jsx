@@ -15,7 +15,9 @@ import {
   FaBars,
   FaSignOutAlt,
   FaShoppingBasket,
-  FaShoppingBag
+  FaShoppingBag,
+  FaJediOrder,
+  FaCartPlus
 } from 'react-icons/fa';
 import { FaShop } from "react-icons/fa6";
 import { BsPersonBadgeFill } from "react-icons/bs";
@@ -103,6 +105,12 @@ function SideBar() {
           >
             Invoices
           </MenuItem>
+           <MenuItem
+            icon={<FaCartPlus />} className='text-gray-700'
+            component={<NavLink to='/dashboard/order' className={linkClass} />}
+          >
+            Orders
+          </MenuItem>
 
         </SubMenu>
 
@@ -124,19 +132,7 @@ function SideBar() {
 
         </SubMenu>
 
-        <MenuItem
-          icon={<FaBook />}
-          component={<NavLink to="/dashboard/PurchaseBill/" className={linkClass} />}
-        >
-          Documentation
-        </MenuItem>
-
-        <MenuItem
-          icon={<FaCalendarAlt />}
-          component={<NavLink to="/dashboard/PurchaseBill/edit/:id" className={linkClass} />}
-        >
-          Calendar
-        </MenuItem>
+       
       </Menu>
       <div
         className="absolute bottom-0 w-full p-2  border-t border-slate-600 text-white flex items-center gap-3 bg-slate-800"

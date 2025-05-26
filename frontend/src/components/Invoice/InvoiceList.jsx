@@ -59,7 +59,7 @@ const InvoiceList = () => {
 
     return (
         <div className="container p-4 mx-auto">
-        <div className="flex bg-gray-300 rounded-sm justify-between items-center p-4 my-2">
+        <div className="flex bg-white rounded-sm justify-between items-center p-4 my-2">
           <h2 className="text-2xl font-bold text-center">Invoices</h2>
           <button
             onClick={() => navigate("add")}
@@ -97,7 +97,7 @@ const InvoiceList = () => {
                         <MdOutlineRemoveRedEye className='text-blue-500 hover:text-blue-600 text-lg cursor-pointer'/>
                       </Link>
                       <Link
-                        to={`/dashboard/invoice/${invoice._id}`}
+                        to={`/dashboard/invoice/edit/${invoice._id}`}
                         className="  p-1 "
                         
                       >

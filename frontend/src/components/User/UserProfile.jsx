@@ -46,8 +46,8 @@ const UserProfile = () => {
 
   return (<>
 
-    <h2 className=" container m-auto my-2 mt-6 p-3 rounded-sm text-2xl font-bold bg-gray-200 shadow-md">User Profile</h2>
-    <div className="flex container mx-auto p-6 bg-gray-100 rounded shadow-md">
+    <h2 className=" container m-auto my-2 mt-6 p-3 rounded-sm text-2xl font-bold bg-white shadow-md w-3/4">User Profile</h2>
+    <div className="flex w-3/4 container mx-auto p-6 bg-gray-100 rounded shadow-md">
       <div className="flex-1/2">
       <img src={user.avatar || 'https://via.placeholder.com/150'} alt="Avatar" className="w-50 h-50 m-auto rounded-full mb-4" />
       </div>

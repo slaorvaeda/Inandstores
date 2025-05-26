@@ -1,6 +1,8 @@
 const express = require('express');
 const Item = require('../Schema/Item.model');
 
+const verifyToken = require('../middleware/auth');
+
 const router = express.Router();
 
 router.post('/', async (req, res) => {
@@ -38,6 +40,8 @@ router.post('/', async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
+
 
 
 router.get('/', async (req, res) => {

@@ -3,7 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function ItemEdit() {
-  const { id } = useParams();              // ID of the item to update
+  const { id } = useParams(); 
+  console.log('Invoice ID:', id);              // ID of the item to update
   const navigate = useNavigate();          // for navigation after update
 
   // Form state with nested structure

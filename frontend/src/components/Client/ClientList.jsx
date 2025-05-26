@@ -40,7 +40,7 @@ const ClientList = () => {
 
   return (
     <div className="p-4 mx-auto">
-           <div className="flex bg-gray-300 rounded-sm justify-between items-center p-4 my-2">
+           <div className="flex bg-white rounded-sm justify-between items-center p-4 my-2">
         <h2 className="text-2xl font-bold text-center">Client List</h2>
         <button
           onClick={() => navigate("add")}
