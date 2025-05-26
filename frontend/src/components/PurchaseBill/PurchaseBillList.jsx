@@ -20,6 +20,7 @@ function PurchaseBillList() {
           },
         });
         setBills(response.data);
+        console.log(response.data);
       } catch (error) {
         console.error("Error fetching bills:", error);
       } finally {
@@ -55,7 +56,7 @@ function PurchaseBillList() {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center bg-gray-300 rounded-sm p-4 mb-4">
+      <div className="flex justify-between items-center bg-white rounded-sm p-4 mb-4">
         <div>
           <h2 className="text-2xl font-bold">Purchase Bills</h2>
           <p className="text-sm text-gray-700">
@@ -95,7 +96,7 @@ function PurchaseBillList() {
                   <td className="px-4 py-2">{bill.billDate?.substring(0, 10)}</td>
                   <td className="px-4 py-2 text-right">₹{bill.totalAmount?.toFixed(2)}</td>
                   <td className="px-4 py-2 text-center flex justify-center gap-3">
-                    <Link to={`/dashboard/purchase-bill/view/${bill._id}`}>
+                    <Link to={`/dashboard/PurchaseBill/${bill._id}`}>
                       <GrView className="text-blue-500 hover:text-blue-600 text-xl cursor-pointer" />
                     </Link>
                     <Link to={`/dashboard/PurchaseBill/edit/${bill._id}`}>

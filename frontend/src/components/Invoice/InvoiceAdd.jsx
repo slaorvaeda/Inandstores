@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useForm, useFieldArray, useWatch } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { MdDelete } from "react-icons/md";
 
 const InvoiceAdd = () => {
   const [clients, setClients] = useState([]);
+  const navigate = useNavigate();
   const { register, handleSubmit, control, reset, setValue } = useForm({
     defaultValues: {
       invoiceNumber: '',
@@ -102,6 +104,7 @@ const InvoiceAdd = () => {
       const response = await axios.post('http://localhost:4000/invoices', transformedData);
       console.log('Invoice saved successfully:', response.data);
       reset();
+      navigate('/dashboard/invoice'); // Redirect to the invoices list
     } catch (error) {
       console.error('Error saving invoice:', error.response?.data?.error || error.message);
       alert('Failed to save invoice. Please try again.');
@@ -117,11 +120,17 @@ const InvoiceAdd = () => {
 
     const cgst = totalTax / 2;
     const sgst = totalTax / 2;
-    const total = subTotal - (parseFloat(discount || 0)) + cgst + sgst + (parseFloat(roundOff || 0));
+    // const total = subTotal - (parseFloat(discount || 0)) + cgst + sgst + (parseFloat(roundOff || 0));
+    const discountedTotal = subTotal - parseFloat(discount || 0);
+    const totalBeforeRoundOff = discountedTotal + cgst + sgst;
+    const computedRoundOff = Math.round(totalBeforeRoundOff) - totalBeforeRoundOff;
+    const total = totalBeforeRoundOff + computedRoundOff;
+
 
     setValue('subTotal', parseFloat(subTotal.toFixed(2)));
     setValue('cgstAmount', parseFloat(cgst.toFixed(2)));
     setValue('sgstAmount', parseFloat(sgst.toFixed(2)));
+    setValue('roundOff', parseFloat(computedRoundOff.toFixed(2)));
     setValue('totalAmount', parseFloat(total.toFixed(2)));
   }, [watchedItems, discount, roundOff, setValue]);
 
@@ -161,7 +170,7 @@ const InvoiceAdd = () => {
           <div className="w-20 font-semibold">Tax %</div>
           <div className="w-40 font-semibold text-center">Total
           </div>
-          </div>
+        </div>
         {fields.map((field, index) => {
           const quantity = watchedItems[index]?.quantity || 0;
           const rate = watchedItems[index]?.rate || 0;

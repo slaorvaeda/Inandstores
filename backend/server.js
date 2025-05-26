@@ -13,6 +13,8 @@ const clientRoutes = require("./Routes/clientRoutes")
 const itemRoutes = require("./Routes/itemRoutes")
 const vendorRoutes = require("./Routes/vendorRoutes")
 const purchaseBillRoutes = require("./Routes/purchaseBillRoutes")
+const dashboardRoutes = require('./Routes/dashboard')
+const orderRoutes = require('./Routes/orderRoutes')
 const ErrorHandler = require("./middleware/ErrorHandler")
 
 dotenv.config()
@@ -31,8 +33,9 @@ app.use(route)
 app.use('/api/clients',clientRoutes )
 app.use('/api/items', itemRoutes);
 app.use('/api/vendors', vendorRoutes);
-
+app.use('/api', dashboardRoutes);
 app.use('/api/purchasebills', purchaseBillRoutes);
+app.use('/api/orders', orderRoutes);
 
 
 // JWT secret key
@@ -56,6 +59,16 @@ const verifyToken = (req, res, next) => {
     next()
   })
 }
+
+
+app.get("/api/items", async (req, res) => {
+  try {
+    const items = await Item.find({}, "name stockQty"); // Only fetch name and stockQty fields
+    res.json(items);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 // Handle undefined routes
 app.use((req, res, next) => {

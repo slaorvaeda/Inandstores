@@ -23,6 +23,13 @@ import PurchaseBillForm from '../components/PurchaseBill/PurchaseBillForm'
 import PurchaseBillList from '../components/PurchaseBill/PurchaseBillList'
 import PurchaseBillEdit from '../components/PurchaseBill/PurchaseBillEdit'
 import PurchaseBillView from '../components/PurchaseBill/PurchaseBillView'
+import DashboardContent from '../components/DashboardContent'
+import InvoiceEdit from '../components/Invoice/InvoiceEdit'
+import CreateOrder from '../components/Orders/CreateOrde'
+import ViewOrder from '../components/Orders/OrderList'
+import OrderList from '../components/Orders/OrderList'
+import OrderView from '../components/Orders/OrderView'
+import OrderEdit from '../components/Orders/OrderEdit'
 
 const router = createBrowserRouter([
     {
@@ -46,6 +53,10 @@ const router = createBrowserRouter([
                 element: <Dashboard />,
                 children: [
                     {
+                        path: '',
+                        element: <DashboardContent />
+                    },
+                    {
                         path: 'invoice/add',
                         element: <InvoiceAdd />
                     },
@@ -64,6 +75,10 @@ const router = createBrowserRouter([
                     {
                         path: 'invoice/:invoiceId',
                         element: <InvoiceView />
+                    },
+                    {
+                        path: 'invoice/edit/:invoiceId',
+                        element: <InvoiceEdit />
                     },
                     {
                         path: 'client',
@@ -110,6 +125,19 @@ const router = createBrowserRouter([
                     },{
                         path: 'purchasebill/:id',
                         element: <PurchaseBillView />
+                    },{
+                        path: 'Order/add',
+                        element: <CreateOrder />
+                    },
+                    {
+                        path: 'Order',
+                        element: <OrderList />
+                    },{
+                        path: 'Order/:id',
+                        element: <OrderView />
+                    },{
+                        path: 'Order/edit/:id',
+                        element: <OrderEdit />
                     }
                 ]
             }

@@ -53,7 +53,7 @@ exports.getBills = async (req, res) => {
 }
 exports.getBillById = async (req, res) => {
   try {
-    const bill = await PurchaseBill.findById(req.params.id);
+    const bill = await PurchaseBill.findById(req.params.id).populate('vendor', 'name'); // Populate vendor name
     if (!bill) {
       return res.status(404).json({ error: 'Purchase Bill not found.' });
     }
@@ -65,7 +65,7 @@ exports.getBillById = async (req, res) => {
 };
 exports.updateBill = async (req, res) => {
   try {
-    const updatedBill = await PurchaseBill.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updatedBill = await PurchaseBill.findByIdAndUpdate(req.params.id, req.body, { new: true }).populate('vendor', 'name'); // Populate vendor name
     if (!updatedBill) {
       return res.status(404).json({ error: 'Purchase Bill not found.' });
     }

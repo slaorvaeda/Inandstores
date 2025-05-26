@@ -15,6 +15,7 @@ function PurchaseBillView() {
           headers: { Authorization: `Bearer ${token}` },
         });
         setBill(res.data);
+        // console.log(res.data);
       } catch (error) {
         console.error("Failed to load bill:", error);
       } finally {

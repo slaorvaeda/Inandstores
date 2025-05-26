@@ -50,7 +50,7 @@ const ItemList = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="flex bg-gray-300 rounded-sm justify-between items-center p-4 my-2">
+      <div className="flex bg-white rounded-sm justify-between items-center p-4 my-2">
         <h2 className="text-2xl font-bold text-center">Item List</h2>
         <button
           onClick={() => navigate("newitem")}
