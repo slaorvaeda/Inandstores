@@ -15,6 +15,9 @@ function ItemEdit() {
     hsnCode: '',
     taxPreference: 'Taxable',
     images: [],           // array of image URLs
+    stockQuantity: 0,
+    reorderLevel: 10,
+    reorderQuantity: 50,
     salesInfo: {
       sellingPrice: '',
       account: '',
@@ -48,6 +51,9 @@ function ItemEdit() {
           hsnCode: data.hsnCode || '',
           taxPreference: data.taxPreference || 'Taxable',
           images: data.images || [],
+          stockQuantity: data.stockQuantity || 0,
+          reorderLevel: data.reorderLevel || 10,
+          reorderQuantity: data.reorderQuantity || 50,
           salesInfo: {
             sellingPrice: data.salesInfo?.sellingPrice || '',
             account: data.salesInfo?.account || '',

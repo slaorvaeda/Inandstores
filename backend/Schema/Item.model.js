@@ -13,6 +13,11 @@ const itemSchema = new mongoose.Schema({
   taxPreference: { type: String, enum: ['Taxable', 'Non-Taxable'], default: 'Taxable' },
   images: [{ type: String }],
 
+  // Stock management fields
+  stockQuantity: { type: Number, default: 0, min: 0 },
+  reorderLevel: { type: Number, default: 10 },
+  reorderQuantity: { type: Number, default: 50 },
+
   salesInfo: {
     sellingPrice: { type: Number },
     account: { type: String },

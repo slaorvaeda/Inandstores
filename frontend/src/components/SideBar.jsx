@@ -1,160 +1,232 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Sidebar,
-  Menu,
-  MenuItem,
-  SubMenu,
-  useProSidebar,
-} from 'react-pro-sidebar';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
-  FaChartPie,
-  FaChartLine,
-  FaBook,
-  FaCalendarAlt,
-  FaBars,
-  FaSignOutAlt,
-  FaShoppingBasket,
   FaShoppingBag,
-  FaJediOrder,
-  FaCartPlus
+  FaBars,
+  FaTimes,
+  FaSignOutAlt,
+  FaList,
+  FaUsers,
+  FaFileInvoice,
+  FaShoppingCart,
+  FaUserTie,
+  FaReceipt,
 } from 'react-icons/fa';
-import { FaShop } from "react-icons/fa6";
-import { BsPersonBadgeFill } from "react-icons/bs";
-import { IoIosPerson } from "react-icons/io";
-import { IoCartOutline } from "react-icons/io5";
-import { LuShoppingBag } from "react-icons/lu";
-import { TbInvoice } from "react-icons/tb";
+import {
+  IoCartOutline,
+} from 'react-icons/io5';
+import {
+  LuShoppingBag,
+} from 'react-icons/lu';
 import axios from 'axios';
 import { useAuth } from '../assets/AuthContext';
 
-function SideBar() {
-  const { collapseSidebar, collapsed } = useProSidebar();
+function SideBar({ isMobileMenuOpen, setIsMobileMenuOpen }) {
   const [avatar, setAvatar] = useState("https://via.placeholder.com/40");
   const [userName, setUserName] = useState("User");
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
 
-
   const handleLogout = () => {
-    localStorage.removeItem("token");
     logout();
     navigate("/login");
   };
 
-  // Fetch user avatar and name from the server
   useEffect(() => {
-    const fetchAvatar = async () => {
+    const fetchUserData = async () => {
       try {
         const userId = localStorage.getItem("userId");
-        // console.log(localStorage.getItem("userId")) ;
-
         const response = await axios.get(`http://localhost:4000/avatar/${userId}`);
-        setAvatar(response.data.avatar || "https://via.placeholder.com/40"); // Use default if no avatar
-        setUserName(response.data.name || "User"); // Set user name if available
+        setAvatar(response.data.avatar || "https://via.placeholder.com/40");
+        setUserName(response.data.name || "User");
       } catch (err) {
         console.error("Error fetching avatar:", err);
       }
     };
 
-    fetchAvatar();
+    fetchUserData();
   }, []);
 
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isMobileMenuOpen && !event.target.closest('.sidebar-container')) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMobileMenuOpen, setIsMobileMenuOpen]);
 
   const linkClass = ({ isActive }) =>
-    `text-gray-300 no-underline ${isActive ? 'bg-slate-700' : ''}`;
+    `flex items-center px-4 py-3 text-slate-600 dark:text-slate-300 no-underline transition-colors duration-200 ${
+      isActive ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/50 dark:to-indigo-900/50 text-blue-700 dark:text-blue-300 border-r-2 border-blue-400' : 'hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-800 dark:hover:text-slate-200'
+    }`;
+
+  const mobileLinkClass = ({ isActive }) =>
+    `flex items-center px-4 py-3 text-slate-600 dark:text-slate-300 no-underline transition-colors duration-200 ${
+      isActive ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/50 dark:to-indigo-900/50 text-blue-700 dark:text-blue-300 border-r-2 border-blue-400' : 'hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-800 dark:hover:text-slate-200'
+    }`;
+
+  const menuItems = [
+    {
+      label: "Items",
+      icon: <FaShoppingBag />,
+      subItems: [
+        {
+          label: "New Items",
+          icon: <FaShoppingCart />,
+          path: "/dashboard/item/newitem"
+        },
+        {
+          label: "Inventory Items",
+          icon: <FaList />,
+          path: "/dashboard/item/list"
+        }
+      ]
+    },
+    {
+      label: "Sales",
+      icon: <IoCartOutline />,
+      subItems: [
+        {
+          label: "Customers",
+          icon: <FaUsers />,
+          path: "/dashboard/client"
+        },
+        {
+          label: "Invoices",
+          icon: <FaFileInvoice />,
+          path: "/dashboard/invoice"
+        },
+        {
+          label: "Orders",
+          icon: <FaShoppingCart />,
+          path: "/dashboard/order"
+        }
+      ]
+    },
+    {
+      label: "Purchases",
+      icon: <LuShoppingBag />,
+      subItems: [
+        {
+          label: "Vendor",
+          icon: <FaUserTie />,
+          path: "/dashboard/vendor"
+        },
+        {
+          label: "Bill",
+          icon: <FaReceipt />,
+          path: "/dashboard/PurchaseBill"
+        }
+      ]
+    }
+  ];
+
+  const SidebarContent = ({ isMobile = false }) => (
+    <div className={`h-full flex flex-col ${isMobile ? 'w-64' : ''}`}>
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-4 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-slate-100 to-blue-100 dark:from-slate-800 dark:to-slate-900">
+        {(!isCollapsed || isMobile) && (
+          <Link to='/dashboard' className="text-lg font-bold text-slate-700 dark:text-slate-200">
+            Dashboard
+          </Link>
+        )}
+        <div className="flex items-center gap-2">
+          {!isMobile && (
+            <button 
+              onClick={() => setIsCollapsed(!isCollapsed)} 
+              className="text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+            >
+              <FaBars className="text-xl" />
+            </button>
+          )}
+          {isMobile && (
+            <button 
+              onClick={() => setIsMobileMenuOpen(false)} 
+              className="text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+            >
+              <FaTimes className="text-xl" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Menu Items */}
+      <div className="flex-1 overflow-y-auto py-2">
+        {menuItems.map((menuItem, index) => (
+          <div key={index} className="mb-2">
+            <div className="px-4 py-2 text-slate-500 dark:text-slate-400 text-sm font-medium flex items-center gap-2">
+              {menuItem.icon}
+              {(!isCollapsed || isMobile) && <span>{menuItem.label}</span>}
+            </div>
+            {menuItem.subItems.map((subItem, subIndex) => (
+              <NavLink
+                key={subIndex}
+                to={subItem.path}
+                className={isMobile ? mobileLinkClass : linkClass}
+                onClick={() => isMobile && setIsMobileMenuOpen(false)}
+              >
+                <span className="mr-3">{subItem.icon}</span>
+                {(!isCollapsed || isMobile) && <span>{subItem.label}</span>}
+              </NavLink>
+            ))}
+          </div>
+        ))}
+      </div>
+
+      {/* User Profile */}
+      <div className="border-t border-slate-200 dark:border-slate-700 p-4 bg-gradient-to-r from-slate-100 to-blue-100 dark:from-slate-800 dark:to-slate-900">
+        <div className="flex items-center gap-3">
+          <img
+            src={avatar}
+            alt="User Avatar"
+            className="w-8 h-8 rounded-full border-2 border-slate-200 dark:border-slate-600 shadow-sm"
+          />
+          {(!isCollapsed || isMobile) && (
+            <div className="flex-1">
+              <div className="text-sm font-medium text-slate-700 dark:text-slate-200">{userName}</div>
+              <button
+                onClick={handleLogout}
+                className="text-xs text-rose-600 hover:text-rose-700 flex items-center gap-1 mt-1 transition-colors"
+              >
+                <FaSignOutAlt /> Logout
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
-    <Sidebar backgroundColor="#1e293b" style={{ height: '90vh' }} rootStyles={{
-      color: '#f6f6f6',
-    }}>
-      <div className="flex items-center justify-between px-4 p-2 text-yellow-400 ">
-        {!collapsed &&
-          <Link to='/dashboard'><h2 className="text-lg font-bold">Dashboard</h2></Link>}
-        <button onClick={() => collapseSidebar()} className="text-gray-300 hover:text-gray-700 pl-3">
-          <FaBars className='text-xl cursor-pointer' />
-        </button>
+    <>
+      {/* Mobile Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40" />
+      )}
+
+      {/* Mobile Sidebar */}
+      <div className={`lg:hidden fixed top-0 left-0 h-full z-50 transition-transform duration-300 ${
+        isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
+        <div className="bg-gradient-to-b from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-900 border-r border-slate-200 dark:border-slate-700 h-full sidebar-container shadow-lg">
+          <SidebarContent isMobile={true} />
+        </div>
       </div>
 
-      <Menu iconShape="circle" >
-        <SubMenu label="Items" icon={<FaShoppingBag />} className="text-gray-300 hover:text-gray-700 ">
-          <MenuItem
-            icon={<FaShoppingBasket />} className='text-gray-700'
-            component={<NavLink to="/dashboard/item/newitem" className={linkClass} />}
-          >
-            NewItems
-          </MenuItem>
-          <MenuItem
-            icon={<FaShop />} className='text-gray-700'
-            component={<NavLink to="/dashboard/item/list" className={linkClass} />}
-          >
-            Inventory Items
-          </MenuItem>
-        </SubMenu>
-
-        <SubMenu label="Sales" icon={<IoCartOutline />} className="text-gray-300 hover:text-gray-700">
-          <MenuItem
-            icon={<IoIosPerson />} className='text-gray-700'
-            component={<NavLink to="/dashboard/client" className={linkClass} />}
-          >
-            Customers
-          </MenuItem>
-          <MenuItem
-            icon={<FaChartLine />} className='text-gray-700'
-            component={<NavLink to="/dashboard/invoice" className={linkClass} />}
-          >
-            Invoices
-          </MenuItem>
-           <MenuItem
-            icon={<FaCartPlus />} className='text-gray-700'
-            component={<NavLink to='/dashboard/order' className={linkClass} />}
-          >
-            Orders
-          </MenuItem>
-
-        </SubMenu>
-
-        <SubMenu label="Purchases" icon={<LuShoppingBag />} className="text-gray-300 hover:text-gray-700">
-          <MenuItem
-            icon={<BsPersonBadgeFill />} className='text-gray-700'
-            component={<NavLink to="/dashboard/vendor" className={linkClass} />}
-          >
-            Vender
-          </MenuItem>
-          <MenuItem
-            icon={<TbInvoice />} className='text-gray-700'
-            component={<NavLink to="/dashboard/PurchaseBill" className={linkClass} />}
-          >
-            Bill
-          </MenuItem>
-
-
-
-        </SubMenu>
-
-       
-      </Menu>
-      <div
-        className="absolute bottom-0 w-full p-2  border-t border-slate-600 text-white flex items-center gap-3 bg-slate-800"
-      >
-        <img
-          src={avatar}
-          alt="User Avatar"
-          className="w-8 h-8 rounded-full"
-        />
-        {!collapsed && (
-          <div className="flex justify-around items-center w-full">
-            <div className="text-sm font-medium">{userName} </div>
-            <NavLink
-              to="/logout" onClick={handleLogout}
-              className="text-xs text-red-400 flex items-center gap-1 hover:text-red-300"
-            >
-              <FaSignOutAlt /> Logout
-            </NavLink>
-          </div>
-        )}
+      {/* Desktop Sidebar */}
+      <div className="hidden lg:block">
+        <div className={`bg-gradient-to-b from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-900 border-r border-slate-200 dark:border-slate-700 h-[calc(100vh-4rem)] transition-all duration-300 shadow-sm ${
+          isCollapsed ? 'w-16' : 'w-64'
+        }`}>
+          <SidebarContent />
+        </div>
       </div>
-    </Sidebar>
+    </>
   );
 }
 

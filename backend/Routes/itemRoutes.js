@@ -14,6 +14,9 @@ router.post('/', async (req, res) => {
       unit,
       hsnCode,
       taxPreference,
+      stockQuantity,
+      reorderLevel,
+      reorderQuantity,
       salesInfo,
       purchaseInfo,
     } = req.body;
@@ -29,6 +32,9 @@ router.post('/', async (req, res) => {
       unit,
       hsnCode,
       taxPreference,
+      stockQuantity: stockQuantity || 0,
+      reorderLevel: reorderLevel || 10,
+      reorderQuantity: reorderQuantity || 50,
       salesInfo,
       purchaseInfo,
     });
@@ -87,5 +93,38 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// Stock management endpoint
+router.patch('/:id/stock', async (req, res) => {
+  try {
+    const { quantity, operation } = req.body; // operation: 'add' or 'subtract'
+    
+    if (!quantity || !operation) {
+      return res.status(400).json({ error: 'Quantity and operation are required' });
+    }
+
+    const item = await Item.findById(req.params.id);
+    if (!item) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+
+    if (operation === 'add') {
+      item.stockQuantity += quantity;
+    } else if (operation === 'subtract') {
+      if (item.stockQuantity < quantity) {
+        return res.status(400).json({ 
+          error: `Insufficient stock. Available: ${item.stockQuantity}, Requested: ${quantity}` 
+        });
+      }
+      item.stockQuantity -= quantity;
+    } else {
+      return res.status(400).json({ error: 'Invalid operation. Use "add" or "subtract"' });
+    }
+
+    await item.save();
+    res.json(item);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update stock' });
+  }
+});
 
 module.exports = router;
