@@ -30,6 +30,8 @@ import ViewOrder from '../components/Orders/OrderList'
 import OrderList from '../components/Orders/OrderList'
 import OrderView from '../components/Orders/OrderView'
 import OrderEdit from '../components/Orders/OrderEdit'
+import About from '../pages/About'
+import Contact from '../pages/Contact'
 
 const router = createBrowserRouter([
     {
@@ -47,6 +49,14 @@ const router = createBrowserRouter([
             {
                 path: 'signup',
                 element: <Signup />
+            },
+            {
+                path: 'about',
+                element: <About />
+            },
+            {
+                path: 'contact',
+                element: <Contact />
             },
             {
                 path: 'dashboard',

@@ -1,11 +1,37 @@
 import * as React from "react";
-const Signsvg = (props) => (
+import { useState, useEffect } from "react";
+
+const Signsvg = (props) => {
+  const [currentColorIndex, setCurrentColorIndex] = useState(0);
+  
+  const colors = [
+    "#3b82f6", // Blue
+    "#8b5cf6", // Purple
+    "#06b6d4", // Cyan
+    "#10b981", // Emerald
+    "#f59e0b", // Amber
+    "#ef4444", // Red
+    "#ec4899", // Pink
+    "#6366f1", // Indigo
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentColorIndex((prevIndex) => (prevIndex + 1) % colors.length);
+    }, 3000); // Change color every 3 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+    const currentColor = colors[currentColorIndex];
+
+  return (
     <div className="inner-wrap max-h-10">
         <div
             className="animation"
             id="pulse"
             data-mutation-identifier="SingleColorHex1"
-            data-animation-config='{"name":"pulse","fps":25,"background":"#fdf2d9","foreground":["#f2a900"]}'
+            data-animation-config='{"name":"pulse","fps":25,"background":"#f8fafc","foreground":["#3b82f6"]}'
         >
             <svg
                 xmlns:mydata="http://www.w3.org/2000/svg"
@@ -24,10 +50,11 @@ const Signsvg = (props) => (
                 style={{
                     height: "100vh",
                     width: "100vw",
-                    backgroundColor: "rgb(253, 242, 217)",
-                    backgroundImage:
-                        "radial-gradient(circle closest-side, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0) 100%)",
+                    backgroundColor: "rgb(248, 250, 252)",
+                    backgroundImage: `radial-gradient(circle closest-side, ${currentColor}20 0%, ${currentColor}00 100%)`,
+                    transition: "background-image 1.5s ease-in-out",
                 }}
+                className="dark:bg-slate-900"
                 {...props}
             >
                 <style
@@ -40,7 +67,7 @@ const Signsvg = (props) => (
                     }
                 </style>
                 <g
-                    fill="#f2a900"
+                    fill={currentColor}
                     fillRule="none"
                     stroke="none"
                     strokeWidth={1}
@@ -56,6 +83,7 @@ const Signsvg = (props) => (
                     style={{
                         mixBlendMode: "normal",
                         animationPlayState: "running",
+                        transition: "fill 1.5s ease-in-out",
                     }}
                 >
                     <g
@@ -221,11 +249,12 @@ const Signsvg = (props) => (
                     cx="50%"
                     cy="50%"
                     r="45%"
-                    stroke="#f2a900"
+                    stroke={currentColor}
                     strokeWidth={5}
                     fill="none"
                     style={{
                         animationPlayState: "running",
+                        transition: "stroke 1.5s ease-in-out",
                     }}
                 />
                 <circle
@@ -233,11 +262,12 @@ const Signsvg = (props) => (
                     cx="50%"
                     cy="50%"
                     r="45%"
-                    stroke="#f2a900"
+                    stroke={currentColor}
                     strokeWidth={5}
                     fill="none"
                     style={{
                         animationPlayState: "running",
+                        transition: "stroke 1.5s ease-in-out",
                     }}
                 />
                 <circle
@@ -245,15 +275,17 @@ const Signsvg = (props) => (
                     cx="50%"
                     cy="50%"
                     r="45%"
-                    stroke="#f2a900"
+                    stroke={currentColor}
                     strokeWidth={5}
                     fill="none"
                     style={{
                         animationPlayState: "running",
+                        transition: "stroke 1.5s ease-in-out",
                     }}
                 />
             </svg>
         </div>
     </div>
-);
+  );
+};
 export default Signsvg;

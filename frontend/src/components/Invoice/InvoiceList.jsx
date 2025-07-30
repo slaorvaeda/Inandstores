@@ -1,125 +1,64 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { MdDelete, MdOutlineRemoveRedEye,MdModeEdit } from "react-icons/md";
-
+import { useNavigate } from 'react-router-dom';
+import List from '../List';
 
 const InvoiceList = () => {
-    const [invoices, setInvoices] = useState([]);
-    const navigate = useNavigate();
+  const [invoices, setInvoices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchInvoices = async () => {
-            try {
-                const res = await axios.get('http://localhost:4000/invoices');
-                setInvoices(res.data.invoices);
-                console.log('Fetched invoices:', invoices);
-            } catch (err) {
-                console.error('Error fetching invoices:', err);
-            }
-        };
-
-        fetchInvoices();
-    }, []);
-
-    const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this invoice?')) {
-            try {
-                await axios.delete(`http://localhost:4000/invoices/${id}`);
-                alert('Invoice deleted successfully.');
-                setInvoices(prev => prev.filter(inv => inv._id !== id));
-                navigate('/dashboard/invoice'); // Redirect to the invoices list
-            } catch (err) {
-                alert('Failed to delete the invoice.');
-            }
-        }
+  useEffect(() => {
+    const fetchInvoices = async () => {
+      try {
+        const res = await axios.get('http://localhost:4000/invoices');
+        setInvoices(res.data.invoices);
+      } catch (err) {
+        console.error('Error fetching invoices:', err);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const buttonStyle = {
-        display: 'inline-block',
-        padding: '10px 20px',
-        backgroundColor: '#007bff',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '4px',
-        cursor: 'pointer',
-        textAlign: 'center',
+    fetchInvoices();
+  }, []);
 
-    };
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this invoice?')) {
+      try {
+        await axios.delete(`http://localhost:4000/invoices/${id}`);
+        alert('Invoice deleted successfully.');
+        setInvoices(prev => prev.filter(inv => inv._id !== id));
+      } catch (err) {
+        alert('Failed to delete the invoice.');
+      }
+    }
+  };
 
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}-${month}-${year}`;
-      };
-
- 
-
+  if (loading) {
     return (
-        <div className="container p-4 mx-auto">
-        <div className="flex bg-white rounded-sm justify-between items-center p-4 my-2">
-          <h2 className="text-2xl font-bold text-center">Invoices</h2>
-          <button
-            onClick={() => navigate("add")}
-            className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 cursor-pointer"
-          >
-            <span className="text-center pr-1">+</span>New
-          </button>
-        </div>
-      
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-200 text-sm">
-            <thead>
-              <tr className="bg-gray-100 text-gray-700">
-                <th className="text-left py-2 px-4 border-b">Invoice No</th>
-                <th className="text-left py-2 px-4 border-b">Client Name</th>
-                <th className="text-left py-2 px-4 border-b">Date</th>
-                <th className="text-left py-2 px-4 border-b">Total Amount</th>
-                <th className="text-left py-2 px-4 border-b">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {invoices.map((invoice) => (
-                <tr key={invoice._id} className="hover:bg-gray-50">
-                  <td className="py-2 px-4 border-b font-semibold">#{invoice.invoiceNumber}</td>
-                  <td className="py-2 px-4 border-b">{invoice.client?.name}</td>
-                  <td className="py-2 px-4 border-b">{formatDate(invoice.invoiceDate)}</td>
-                  <td className="py-2 px-4 border-b">₹{invoice.totalAmount.toFixed(2)}</td>
-                  <td className="py-2 px-4 border-b">
-                    <div className="flex gap-2">
-                      <Link
-                        to={`/dashboard/invoice/${invoice._id}`}
-                        className="  p-1 "
-                        
-                      >
-                        <MdOutlineRemoveRedEye className='text-blue-500 hover:text-blue-600 text-lg cursor-pointer'/>
-                      </Link>
-                      <Link
-                        to={`/dashboard/invoice/edit/${invoice._id}`}
-                        className="  p-1 "
-                        
-                      >
-                        <MdModeEdit className='text-green-500 hover:text-green-600 text-lg cursor-pointer'/>
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(invoice._id)}
-                        className=" text-white p-1 "
-                        
-                      >
-                        <MdDelete className='text-red-500 hover:text-red-600 text-lg cursor-pointer'/>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-flex items-center px-4 py-2 font-semibold leading-6 text-gray-600">
+            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Loading invoices...
+          </div>
         </div>
       </div>
-      
     );
+  }
+
+  return (
+    <List 
+      name="Invoice" 
+      heading="Invoices" 
+      lists={invoices} 
+      handleDelete={handleDelete} 
+    />
+  );
 };
 
 export default InvoiceList;

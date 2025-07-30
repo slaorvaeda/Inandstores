@@ -1,17 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router";
-import { FaUserTie, FaUsers, FaBoxOpen, FaFileInvoice, FaFileAlt } from 'react-icons/fa';
+import { FaUserTie, FaUsers, FaBoxOpen, FaFileInvoice, FaFileAlt, FaExclamationTriangle } from 'react-icons/fa';
 
 export default function DashboardContent() {
   const [data, setData] = useState(null);
+  const [lowStockItems, setLowStockItems] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     const userId = localStorage.getItem('userId');
-    axios.get(`http://localhost:4000/api/dashboard?userId=${userId}`)
-      .then(res => setData(res.data))
-      .catch(err => console.error(err));
+    const fetchData = async () => {
+      try {
+        const [dashboardRes, itemsRes] = await Promise.all([
+          axios.get(`http://localhost:4000/api/dashboard?userId=${userId}`),
+          axios.get(`http://localhost:4000/api/items?userId=${userId}`)
+        ]);
+        
+        setData(dashboardRes.data);
+        
+        // Filter low stock items
+        const items = itemsRes.data;
+        const lowStock = items.filter(item => 
+          (item.stockQuantity || 0) <= (item.reorderLevel || 10)
+        );
+        setLowStockItems(lowStock);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    
+    fetchData();
   }, []);
 
   if (!data) return <DashboardSkeleton />;
@@ -20,7 +39,7 @@ export default function DashboardContent() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <h1 className="text-4xl font-bold mb-8 text-gray-800">Dashboard</h1>
+      <h1 className="text-4xl font-bold mb-8 text-gray-800 dark:text-slate-200">Dashboard</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-12">
         <div onClick={() => navigate('client')} className="cursor-pointer">
@@ -71,6 +90,45 @@ export default function DashboardContent() {
           />
         </SectionCard>
       </div>
+
+      {/* Low Stock Alert Section */}
+      {lowStockItems.length > 0 && (
+        <div className="mb-8">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center mb-3">
+              <FaExclamationTriangle className="text-red-500 mr-2" />
+              <h3 className="text-lg font-semibold text-red-800">Low Stock Alert</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {lowStockItems.slice(0, 6).map(item => (
+                <div key={item._id} className="bg-white p-3 rounded border border-red-200">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="font-medium text-gray-900">{item.name}</h4>
+                      <p className="text-sm text-gray-600">SKU: {item.sku}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-red-600 font-semibold">{item.stockQuantity || 0}</span>
+                      <p className="text-xs text-gray-500">in stock</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => navigate('/dashboard/item/list')}
+                    className="mt-2 w-full bg-red-100 text-red-700 px-3 py-1 rounded text-sm hover:bg-red-200"
+                  >
+                    Manage Stock
+                  </button>
+                </div>
+              ))}
+            </div>
+            {lowStockItems.length > 6 && (
+              <p className="text-sm text-red-600 mt-3">
+                +{lowStockItems.length - 6} more items need attention
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <SummaryCard title="Sales & Purchase Summary (This Month)">
