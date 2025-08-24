@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router";
 import { FaUserTie, FaUsers, FaBoxOpen, FaFileInvoice, FaFileAlt, FaExclamationTriangle } from 'react-icons/fa';
+import { API_ENDPOINTS, getApiUrlWithUserId } from '../config/api';
 
 export default function DashboardContent() {
   const [data, setData] = useState(null);
@@ -13,8 +14,8 @@ export default function DashboardContent() {
     const fetchData = async () => {
       try {
         const [dashboardRes, itemsRes] = await Promise.all([
-          axios.get(`http://localhost:4000/api/dashboard?userId=${userId}`),
-          axios.get(`http://localhost:4000/api/items?userId=${userId}`)
+          axios.get(getApiUrlWithUserId(API_ENDPOINTS.DASHBOARD)),
+          axios.get(getApiUrlWithUserId(API_ENDPOINTS.ITEMS))
         ]);
         
         setData(dashboardRes.data);

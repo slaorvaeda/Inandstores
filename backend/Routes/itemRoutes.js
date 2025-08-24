@@ -5,6 +5,9 @@ const verifyToken = require('../middleware/auth');
 
 const router = express.Router();
 
+// Apply authentication middleware to all routes
+router.use(verifyToken);
+
 router.post('/', async (req, res) => {
   try {
     const {
@@ -17,6 +20,7 @@ router.post('/', async (req, res) => {
       stockQuantity,
       reorderLevel,
       reorderQuantity,
+      sellingPrice,
       salesInfo,
       purchaseInfo,
     } = req.body;
@@ -35,6 +39,7 @@ router.post('/', async (req, res) => {
       stockQuantity: stockQuantity || 0,
       reorderLevel: reorderLevel || 10,
       reorderQuantity: reorderQuantity || 50,
+      sellingPrice: req.body.sellingPrice || 0, // Add sellingPrice field
       salesInfo,
       purchaseInfo,
     });

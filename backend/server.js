@@ -7,7 +7,8 @@ const user = require("./Schema/Newuser")
 const bcrypt = require("bcrypt")
 
 const route = require("./Routes/route")
-const dbConfig = require("./config/db.config")
+// Import database configuration to ensure connection
+require("./config/db.config")
 const ApiError = require("./utils/ApiError")
 const clientRoutes = require("./Routes/clientRoutes")
 const itemRoutes = require("./Routes/itemRoutes")
@@ -15,7 +16,12 @@ const vendorRoutes = require("./Routes/vendorRoutes")
 const purchaseBillRoutes = require("./Routes/purchaseBillRoutes")
 const dashboardRoutes = require('./Routes/dashboard')
 const orderRoutes = require('./Routes/orderRoutes')
-const ErrorHandler = require("./middleware/ErrorHandler")
+const googleAuthRoutes = require('./Routes/googleAuthRoutes')
+const userRoutes = require('./Routes/userRoutes')
+const khataRoutes = require('./Routes/khataRoutes')
+
+
+const { ErrorHandling } = require("./middleware/ErrorHandler")
 
 dotenv.config()
 
@@ -36,6 +42,10 @@ app.use('/api/vendors', vendorRoutes);
 app.use('/api', dashboardRoutes);
 app.use('/api/purchasebills', purchaseBillRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/auth/google', googleAuthRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/khata', khataRoutes);
+
 
 
 // JWT secret key
@@ -44,31 +54,9 @@ if (!JWT_SECRET) {
   console.error("JWT_SECRET is not defined in .env file")
   process.exit(1)
 }
-  
-// Middleware 
-const verifyToken = (req, res, next) => {
-  const token = req.headers["authorization"]
-  if (!token) {
-    return res.status(403).json({ message: "A token is required for authentication" })
-  }
-  jwt.verify(token, JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ message: "Invalid Token" })
-    }
-    req.user = decoded
-    next()
-  })
-}
 
 
-app.get("/api/items", async (req, res) => {
-  try {
-    const items = await Item.find({}, "name stockQty"); // Only fetch name and stockQty fields
-    res.json(items);
-  } catch (err) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
+// Remove this duplicate route as it's handled in itemRoutes
 
 // Handle undefined routes
 app.use((req, res, next) => {
@@ -77,9 +65,11 @@ app.use((req, res, next) => {
 })
 
 
-app.use(ErrorHandler)
+app.use(ErrorHandling)
 
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`)
+  
+
 })

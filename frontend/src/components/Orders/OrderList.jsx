@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { MdDelete, MdOutlineRemoveRedEye, MdModeEdit } from "react-icons/md";
 import List from '../List';
+import { API_ENDPOINTS, getAuthHeaders, getApiUrlWithUserId } from '../../config/api';
 
 const OrderList = () => {
   const [orders, setOrders] = useState([]);
@@ -11,7 +12,7 @@ const OrderList = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get('http://localhost:4000/api/orders');
+        const res = await axios.get(API_ENDPOINTS.ORDERS);
         setOrders(res.data.orders);
       } catch (err) {
         console.error('Error fetching orders:', err);
@@ -24,7 +25,7 @@ const OrderList = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this order?')) {
       try {
-        await axios.delete(`http://localhost:4000/api/orders/${id}`);
+        await axios.delete(API_ENDPOINTS.ORDER_BY_ID(id));
         alert('Order deleted successfully.');
         setOrders(prev => prev.filter(order => order._id !== id));
       } catch (err) {

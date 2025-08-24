@@ -3,6 +3,7 @@ import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { MdDelete } from 'react-icons/md';
+import { API_ENDPOINTS, getAuthHeaders, getApiUrlWithUserId } from '../../config/api';
 
 const OrderEdit = () => {
     const [clients, setClients] = useState([]);
@@ -40,9 +41,9 @@ const OrderEdit = () => {
         const fetchData = async () => {
             try {
                 const [clientsRes, itemsRes, orderRes] = await Promise.all([
-                    axios.get('http://localhost:4000/api/clients'),
-                    axios.get(`http://localhost:4000/api/items?userId=${localStorage.getItem('userId')}`),
-                    axios.get(`http://localhost:4000/api/orders/${id}`)
+                    axios.get(API_ENDPOINTS.CLIENTS),
+                    axios.get(getApiUrlWithUserId(API_ENDPOINTS.ITEMS)),
+                    axios.get(API_ENDPOINTS.ORDER_BY_ID(id))
                 ]);
 
                 setClients(clientsRes.data.clients);
@@ -137,7 +138,7 @@ const OrderEdit = () => {
                 customerNotes: data.customerNotes,
             };
 
-            await axios.put(`http://localhost:4000/api/orders/${id}`, updatedOrder);
+            await axios.put(API_ENDPOINTS.ORDER_BY_ID(id), updatedOrder);
             alert('Order updated successfully!');
             navigate('/dashboard/order');
         } catch (err) {

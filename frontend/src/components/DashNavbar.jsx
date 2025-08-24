@@ -11,7 +11,7 @@ const DashNavbar = ({ onMenuToggle }) => {
     };
 
     return (
-        <nav className="bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-900 border-b border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 px-6 lg:px-0 lg:pr-4 py-3 lg:py-4 flex items-center justify-between shadow-sm">
+        <nav className="bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-900 border-b border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 px-6 lg:px-0 lg:pr-4 py-3 lg:py-4 flex items-center justify-between shadow-sm md:rounded-b-4xl">
             {/* Left side - Hamburger (mobile only) */}
             <div className="flex items-center w-12 lg:hidden">
                 {/* Mobile Hamburger Button */}

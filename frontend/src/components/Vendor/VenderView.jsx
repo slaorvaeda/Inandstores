@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import { API_ENDPOINTS, getAuthHeaders, getApiUrlWithUserId } from '../../config/api';
 
 const VendorView = () => {
   const { id } = useParams();
@@ -10,10 +11,9 @@ const VendorView = () => {
 
   useEffect(() => {
     const fetchVendor = async () => {
-      const token = localStorage.getItem("token");
       try {
-        const response = await axios.get(`http://localhost:4000/api/vendors/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
+        const response = await axios.get(API_ENDPOINTS.VENDOR_BY_ID(id), {
+          headers: getAuthHeaders(),
         });
         setVendor(response.data);
       } catch (error) {

@@ -1,5 +1,5 @@
 const Vendor = require('../Schema/Vender.model'); 
-const authenticateToken = require('../middleware/auth');
+const verifyToken = require('../middleware/auth');
 
 
 exports.createVender = async (req, res) => {

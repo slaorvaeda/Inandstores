@@ -1,10 +1,13 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../assets/AuthContext";
 import useRedirectIfAuthenticated from "../hooks/useRedirectIfAuthenticated";
 import HomeNavbar from "../components/HomeNavbar";
 import SvgLogo from "../assets/SvgLogo";
+import { GoogleSignInButton } from "../components/common";
+import { googleAuthService } from "../services/googleAuthService";
+import { API_ENDPOINTS, getAuthHeaders } from '../config/api';
 import { 
   FaEye, 
   FaEyeSlash, 
@@ -45,7 +48,13 @@ const Login = () => {
   const [isSignupLoading, setIsSignupLoading] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
+
+  // Get the intended destination from location state
+  const from = location.state?.from?.pathname || "/dashboard";
+
+  // Google login redirect result is now handled only in /auth/google/callback (GoogleAuthHandler)
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -54,7 +63,7 @@ const Login = () => {
     setLoginSuccess("");
 
     try {
-      const response = await axios.post("http://localhost:4000/login", {
+      const response = await axios.post(API_ENDPOINTS.LOGIN, {
         email: loginEmail,
         password: loginPassword,
       });
@@ -62,9 +71,11 @@ const Login = () => {
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("userId", response.data.user.id);
       
-      login();
+      login(response.data.user);
       setLoginSuccess("Login successful!");
-      navigate("/dashboard");
+      
+      // Redirect to the intended destination or dashboard
+      navigate(from, { replace: true });
       
     } catch (err) {
       console.error("Error:", err);
@@ -72,6 +83,80 @@ const Login = () => {
     } finally {
       setIsLoginLoading(false);
     }
+  };
+
+  // Google sign-in button click handler
+  const handleGoogleSignInButton = async () => {
+    setIsLoginLoading(true);
+    setLoginError("");
+    try {
+      localStorage.setItem('googleSignInInProgress', '1');
+      const result = await googleAuthService.signInWithGoogle();
+      
+      if (result && result.success && result.user && result.token) {
+        localStorage.setItem('token', result.token);
+        localStorage.setItem('userId', result.user.id);
+        
+        login(result.user);
+        
+        // Set isNewUser flag if this is a new user
+        if (result.isNewUser) {
+          localStorage.setItem('isNewUser', 'true');
+        }
+        
+        setLoginSuccess("Google login successful!");
+        setIsLoginLoading(false);
+        
+        // Redirect based on whether user is new
+        if (result.isNewUser) {
+          navigate("/onboarding", { replace: true });
+        } else {
+          navigate("/dashboard", { replace: true });
+        }
+      } else {
+        setLoginError("Google login failed. Please try again.");
+        setIsLoginLoading(false);
+      }
+    } catch (error) {
+      console.error('Google sign-in error:', error);
+      setLoginError(error && error.message ? error.message : 'Google login failed. Please try again.');
+      setIsLoginLoading(false);
+    } finally {
+      localStorage.removeItem('googleSignInInProgress');
+    }
+  };
+
+  // Google sign-in result handler
+  const handleGoogleSignIn = (result) => {
+    if (result && result.user && result.token) {
+      localStorage.setItem('token', result.token);
+      localStorage.setItem('userId', result.user.id);
+      
+      // Set isNewUser flag if this is a new user
+      if (result.isNewUser) {
+        localStorage.setItem('isNewUser', 'true');
+      }
+      
+      login(result.user);
+      setLoginSuccess("Google login successful!");
+      setIsLoginLoading(false);
+      
+      // Redirect based on whether user is new
+      if (result.isNewUser) {
+        navigate("/onboarding", { replace: true });
+      } else {
+        navigate("/dashboard", { replace: true });
+      }
+    } else {
+      setLoginError("Google login failed. Please try again.");
+      setIsLoginLoading(false);
+    }
+    localStorage.removeItem('googleSignInInProgress');
+  };
+
+  const handleGoogleError = (error) => {
+    setLoginError(typeof error === 'string' ? error : (error && error.message ? error.message : 'Google login failed.'));
+    setIsLoginLoading(false);
   };
 
   const handleSignupSubmit = async (e) => {
@@ -86,19 +171,33 @@ const Login = () => {
     setSignupSuccess("");
 
     try {
-      const response = await axios.post("http://localhost:4000/signup", {
+      const response = await axios.post(API_ENDPOINTS.SIGNUP, {
         name: signupName,
         email: signupEmail,
         password: signupPassword,
         avatar: signupAvatar,
       });
-      setSignupSuccess("Signup successful! Please log in.");
-      // Clear form
-      setSignupName("");
-      setSignupEmail("");
-      setSignupPassword("");
-      setSignupConfirmPassword("");
-      setSignupAvatar("");
+      
+      // Auto-login after successful signup
+      const loginResponse = await axios.post(API_ENDPOINTS.LOGIN, {
+        email: signupEmail,
+        password: signupPassword,
+      });
+
+      localStorage.setItem("token", loginResponse.data.token);
+      localStorage.setItem("userId", loginResponse.data.user.id);
+      
+      login(loginResponse.data.user);
+      setSignupSuccess("Signup successful! Redirecting to onboarding...");
+      
+      // Set a flag to indicate this is a new user
+      localStorage.setItem('isNewUser', 'true');
+      
+      // Redirect to onboarding for new users
+      setTimeout(() => {
+        navigate("/onboarding", { replace: true });
+      }, 1500);
+      
     } catch (err) {
       console.error("Error:", err);
       setSignupError(err.response?.data?.message || "Something went wrong!");
@@ -259,6 +358,25 @@ const Login = () => {
                         {loginSuccess}
                       </div>
                     )}
+
+                    {/* Google Sign-In Button */}
+                    <div className="space-y-4">
+                      <GoogleSignInButton 
+                        onSignIn={handleGoogleSignInButton}
+                        onError={handleGoogleError}
+                        disabled={isLoginLoading}
+                      />
+                      
+                      {/* Divider */}
+                      <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                          <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                          <span className="px-2 bg-white dark:bg-slate-900 text-gray-500 dark:text-gray-400">Or continue with email</span>
+                        </div>
+                      </div>
+                    </div>
                     
                     <form onSubmit={handleLoginSubmit} className="space-y-6">
                       <div>
@@ -274,6 +392,7 @@ const Login = () => {
                             value={loginEmail}
                             onChange={(e) => setLoginEmail(e.target.value)}
                             required
+                            autoComplete="email"
                             className="w-full pl-10 pr-4 py-3 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400"
                             placeholder="Enter your email"
                           />
@@ -293,6 +412,7 @@ const Login = () => {
                             value={loginPassword}
                             onChange={(e) => setLoginPassword(e.target.value)}
                             required
+                            autoComplete="current-password"
                             className="w-full pl-10 pr-12 py-3 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400"
                             placeholder="Enter your password"
                           />
@@ -349,6 +469,25 @@ const Login = () => {
                         {signupSuccess}
                       </div>
                     )}
+
+                    {/* Google Sign-In Button for Signup */}
+                    <div className="space-y-4">
+                      <GoogleSignInButton 
+                        onSignIn={handleGoogleSignInButton}
+                        onError={handleGoogleError}
+                        disabled={isSignupLoading}
+                      />
+                      
+                      {/* Divider */}
+                      <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                          <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                          <span className="px-2 bg-white dark:bg-slate-900 text-gray-500 dark:text-gray-400">Or sign up with email</span>
+                        </div>
+                      </div>
+                    </div>
                     
                     <form onSubmit={handleSignupSubmit} className="space-y-6">
                       <div>
@@ -364,6 +503,7 @@ const Login = () => {
                             value={signupName}
                             onChange={(e) => setSignupName(e.target.value)}
                             required
+                            autoComplete="name"
                             className="w-full pl-10 pr-4 py-3 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400"
                             placeholder="Enter your full name"
                           />
@@ -383,6 +523,7 @@ const Login = () => {
                             value={signupEmail}
                             onChange={(e) => setSignupEmail(e.target.value)}
                             required
+                            autoComplete="email"
                             className="w-full pl-10 pr-4 py-3 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400"
                             placeholder="Enter your email"
                           />
@@ -402,6 +543,7 @@ const Login = () => {
                             value={signupPassword}
                             onChange={(e) => setSignupPassword(e.target.value)}
                             required
+                            autoComplete="new-password"
                             className="w-full pl-10 pr-12 py-3 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400"
                             placeholder="Create a password"
                           />
@@ -432,6 +574,7 @@ const Login = () => {
                             value={signupConfirmPassword}
                             onChange={(e) => setSignupConfirmPassword(e.target.value)}
                             required
+                            autoComplete="new-password"
                             className="w-full pl-10 pr-12 py-3 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400"
                             placeholder="Confirm your password"
                           />

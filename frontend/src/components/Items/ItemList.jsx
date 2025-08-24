@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { GrView } from "react-icons/gr";
 import { CiEdit } from "react-icons/ci";
 import { MdDelete } from "react-icons/md";
+import { API_ENDPOINTS, getAuthHeaders, getApiUrlWithUserId } from '../../config/api';
 
 
 
@@ -16,7 +17,7 @@ const ItemList = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await axios.get(`http://localhost:4000/api/items?userId=${userId}`);
+        const response = await axios.get(getApiUrlWithUserId(API_ENDPOINTS.ITEMS));
         setItems(response.data);
         // console.log("Fetched items:", response.data);
       } catch (err) {
@@ -33,7 +34,7 @@ const ItemList = () => {
     if (!window.confirm("Are you sure you want to delete this item?")) return;
 
     try {
-      await axios.delete(`http://localhost:4000/api/items/${id}`);
+      await axios.delete(API_ENDPOINTS.ITEM_BY_ID(id));
       setItems(items.filter((item) => item._id !== id));
     } catch (err) {
       console.error("Error deleting item:", err);
@@ -47,7 +48,7 @@ const ItemList = () => {
 
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-8 rounded-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">

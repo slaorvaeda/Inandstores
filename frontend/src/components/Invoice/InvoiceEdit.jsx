@@ -3,6 +3,7 @@ import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { MdDelete } from "react-icons/md";
+import { API_ENDPOINTS, getAuthHeaders, getApiUrlWithUserId } from '../../config/api';
 
 const InvoiceEdit = () => {
     const { invoiceId } = useParams();
@@ -47,8 +48,8 @@ const InvoiceEdit = () => {
         const fetchData = async () => {
             try {
                 const [invoiceRes, clientsRes] = await Promise.all([
-                    axios.get(`http://localhost:4000/invoices/${invoiceId}`),
-                    axios.get('http://localhost:4000/api/clients')
+                    axios.get(API_ENDPOINTS.INVOICE_BY_ID(invoiceId)),
+                    axios.get(API_ENDPOINTS.CLIENTS)
                 ]);
 
                 setInvoiceData(invoiceRes.data);
@@ -99,7 +100,7 @@ const InvoiceEdit = () => {
                 }))
             };
 
-            await axios.put(`http://localhost:4000/invoices/${invoiceId}`, updatedInvoice);
+            await axios.put(API_ENDPOINTS.INVOICE_BY_ID(invoiceId), updatedInvoice);
             alert('Invoice updated successfully!');
             navigate('/dashboard/invoice');
         } catch (error) {

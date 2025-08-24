@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS, getAuthHeaders, getApiUrlWithUserId } from '../../config/api';
 
 const ItemForm = () => {
     const userId = localStorage.getItem("userId") || '';
@@ -8,7 +9,7 @@ const ItemForm = () => {
     userId,
     name: '',
     sku: '',
-    unit: '',
+    unit: 'Nos', // Set default unit to match schema
     hsnCode: '',
     taxPreference: 'Taxable',
     images: [],
@@ -60,15 +61,30 @@ const ItemForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    console.log("User ID:", userId);
+    // Validate required fields
+    if (!formData.name.trim()) {
+      alert('Item name is required!');
+      return;
+    }
+    
+    if (!formData.unit) {
+      alert('Unit is required!');
+      return;
+    }
+    
+    if (!formData.salesInfo.sellingPrice || parseFloat(formData.salesInfo.sellingPrice) <= 0) {
+      alert('Selling price is required and must be greater than 0!');
+      return;
+    }
   
     try {
       const payload = {
         ...formData,
         userId, // explicitly ensure it's included
+        sellingPrice: parseFloat(formData.salesInfo.sellingPrice), // Move sellingPrice to root level
       };
   
-      await axios.post('http://localhost:4000/api/items', payload);
+      await axios.post(API_ENDPOINTS.ITEMS, payload);
       alert('Item created successfully!');
       navigate('/dashboard/item/list');
     } catch (err) {
@@ -79,7 +95,7 @@ const ItemForm = () => {
   
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-8 rounded-lg">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Header */}
@@ -120,14 +136,29 @@ const ItemForm = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Unit</label>
-                  <input
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Unit *</label>
+                  <select
                     name="unit"
                     value={formData.unit}
                     onChange={handleChange}
-                    placeholder="e.g., pieces, kg, liters"
+                    required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  />
+                  >
+                    <option value="">Select Unit</option>
+                    <option value="Nos">Nos (Numbers)</option>
+                    <option value="Kg">Kg (Kilograms)</option>
+                    <option value="Ltr">Ltr (Liters)</option>
+                    <option value="Mtr">Mtr (Meters)</option>
+                    <option value="Sq Ft">Sq Ft (Square Feet)</option>
+                    <option value="Hour">Hour</option>
+                    <option value="Day">Day</option>
+                    <option value="Month">Month</option>
+                    <option value="Year">Year</option>
+                    <option value="Piece">Piece</option>
+                    <option value="Set">Set</option>
+                    <option value="Box">Box</option>
+                    <option value="Pack">Pack</option>
+                  </select>
                 </div>
 
                 <div>

@@ -1,5 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const verifyToken = require('../middleware/auth');
+
+// Apply authentication middleware to all routes
+router.use(verifyToken);
 
 // const orderController =require('../controllers/OrderController');
 // const verifyToken = require('../middleware/auth');

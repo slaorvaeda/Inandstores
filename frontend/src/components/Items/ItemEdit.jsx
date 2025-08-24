@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_ENDPOINTS, getAuthHeaders, getApiUrlWithUserId } from '../../config/api';
 
 function ItemEdit() {
   const { id } = useParams(); 
@@ -41,7 +42,7 @@ function ItemEdit() {
   useEffect(() => {
     async function fetchItem() {
       try {
-        const res = await axios.get(`http://localhost:4000/api/items/${id}`);
+        const res = await axios.get(API_ENDPOINTS.ITEM_BY_ID(id));
         const data = res.data;
         // Populate form state with fetched data
         setItem({
@@ -136,7 +137,7 @@ function ItemEdit() {
       if (newFiles.length > 0) {
         const formData = new FormData();
         newFiles.forEach(file => formData.append('files', file));
-        const uploadRes = await axios.post('http://localhost:4000/api/upload-multiple', formData, {
+        const uploadRes = await axios.post(API_ENDPOINTS.UPLOAD_MULTIPLE, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         // Assume response contains { imageUrls: [...] }
@@ -148,7 +149,7 @@ function ItemEdit() {
         images: imageUrls,
       };
       // Send PUT request to update item
-      await axios.put(`http://localhost:4000/api/items/${id}`, updatedData);
+      await axios.put(API_ENDPOINTS.ITEM_BY_ID(id), updatedData);
       // Navigate back to items list on success
       navigate('/dashboard/item/list');
     } catch (err) {
@@ -224,7 +225,7 @@ function ItemEdit() {
                   src={url} 
                   alt={`Item ${idx}`} 
                   className="w-24 h-24 object-cover border rounded"
-                  onError={e => e.currentTarget.src = 'https://via.placeholder.com/150'}
+                  onError={e => e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 150 150'%3E%3Crect width='150' height='150' fill='%23e5e7eb'/%3E%3Ctext x='75' y='85' font-family='Arial' font-size='60' text-anchor='middle' fill='%236b7280'%3E📦%3C/text%3E%3C/svg%3E"}
                 />
                 <button
                   type="button"
@@ -240,7 +241,7 @@ function ItemEdit() {
                   src={url} 
                   alt={`New upload ${idx}`} 
                   className="w-24 h-24 object-cover border rounded"
-                  onError={e => e.currentTarget.src = 'https://via.placeholder.com/150'}
+                  onError={e => e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 150 150'%3E%3Crect width='150' height='150' fill='%23e5e7eb'/%3E%3Ctext x='75' y='85' font-family='Arial' font-size='60' text-anchor='middle' fill='%236b7280'%3E📦%3C/text%3E%3C/svg%3E"}
                 />
                 <button
                   type="button"

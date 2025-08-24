@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS, getAuthHeaders, getApiUrlWithUserId } from '../../config/api';
 
 const OrderView = () => {
   const { id } = useParams();
@@ -10,7 +11,7 @@ const OrderView = () => {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const res = await axios.get(`http://localhost:4000/api/orders/${id}`);
+        const res = await axios.get(API_ENDPOINTS.ORDER_BY_ID(id));
         setOrder(res.data.order);
       } catch (err) {
         console.error('Error fetching order:', err);

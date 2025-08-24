@@ -5,6 +5,7 @@ import Signup from '../pages/signup'
 import Dashboard from '../pages/Dashboard'
 import Home from '../pages/Home'
 import Notfound from '../pages/Notfound'
+import PrivateRoute from '../assets/PrivateRoute'
 import ClientAdd from '../components/Client/Clientadd'
 import InvoiceList from '../components/Invoice/InvoiceList'
 import InvoiceView from '../components/Invoice/InvoiceView'
@@ -32,6 +33,13 @@ import OrderView from '../components/Orders/OrderView'
 import OrderEdit from '../components/Orders/OrderEdit'
 import About from '../pages/About'
 import Contact from '../pages/Contact'
+import GoogleAuthHandler from '../components/common/GoogleAuthHandler'
+
+import UserOnboarding from '../pages/UserOnboarding'
+import { KhataList, KhataDetail } from '../features/khata';
+import KhataSetup from '../pages/KhataSetup';
+
+
 
 const router = createBrowserRouter([
     {
@@ -42,6 +50,7 @@ const router = createBrowserRouter([
                 path: '/',
                 element: <Home />
             },
+
             {
                 path: 'login',
                 element: <Login />
@@ -59,8 +68,25 @@ const router = createBrowserRouter([
                 element: <Contact />
             },
             {
+                path: 'auth/google/callback',
+                element: <GoogleAuthHandler />
+            },
+
+            {
+                path: 'onboarding',
+                element: (
+                    <PrivateRoute>
+                        <UserOnboarding />
+                    </PrivateRoute>
+                )
+            },
+            {
                 path: 'dashboard',
-                element: <Dashboard />,
+                element: (
+                    <PrivateRoute>
+                        <Dashboard />
+                    </PrivateRoute>
+                ),
                 children: [
                     {
                         path: '',
@@ -145,10 +171,28 @@ const router = createBrowserRouter([
                     },{
                         path: 'Order/:id',
                         element: <OrderView />
-                    },{
+                    },                    {
                         path: 'Order/edit/:id',
                         element: <OrderEdit />
-                    }
+                    },
+                    {
+                        path: 'khata-setup',
+                        element: <KhataSetup />
+                    },
+                    {
+                        path: 'khata',
+                        element: <KhataList />
+                    },
+                    {
+                        path: 'khata/:khataId',
+                        element: <KhataDetail />
+                    },
+                    {
+                        path: 'khata/:khataId/edit',
+                        element: <KhataDetail />
+                    },
+
+
                 ]
             }
         ],

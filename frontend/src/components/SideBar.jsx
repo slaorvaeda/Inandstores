@@ -11,6 +11,7 @@ import {
   FaShoppingCart,
   FaUserTie,
   FaReceipt,
+  FaBook,
 } from 'react-icons/fa';
 import {
   IoCartOutline,
@@ -20,11 +21,11 @@ import {
 } from 'react-icons/lu';
 import axios from 'axios';
 import { useAuth } from '../assets/AuthContext';
+import { API_ENDPOINTS } from '../config/api';
 
-function SideBar({ isMobileMenuOpen, setIsMobileMenuOpen }) {
-  const [avatar, setAvatar] = useState("https://via.placeholder.com/40");
+function SideBar({ isMobileMenuOpen, setIsMobileMenuOpen, isCollapsed, setIsCollapsed }) {
+  const [avatar, setAvatar] = useState("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23e5e7eb'/%3E%3Ctext x='20' y='25' font-family='Arial' font-size='16' text-anchor='middle' fill='%236b7280'%3E👤%3C/text%3E%3C/svg%3E");
   const [userName, setUserName] = useState("User");
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -37,8 +38,8 @@ function SideBar({ isMobileMenuOpen, setIsMobileMenuOpen }) {
     const fetchUserData = async () => {
       try {
         const userId = localStorage.getItem("userId");
-        const response = await axios.get(`http://localhost:4000/avatar/${userId}`);
-        setAvatar(response.data.avatar || "https://via.placeholder.com/40");
+        const response = await axios.get(API_ENDPOINTS.USER_AVATAR + `/${userId}`);
+        setAvatar(response.data.avatar || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23e5e7eb'/%3E%3Ctext x='20' y='25' font-family='Arial' font-size='16' text-anchor='middle' fill='%236b7280'%3E👤%3C/text%3E%3C/svg%3E");
         setUserName(response.data.name || "User");
       } catch (err) {
         console.error("Error fetching avatar:", err);
@@ -120,10 +121,22 @@ function SideBar({ isMobileMenuOpen, setIsMobileMenuOpen }) {
         {
           label: "Bill",
           icon: <FaReceipt />,
-          path: "/dashboard/PurchaseBill"
+          path: "/dashboard/purchasebill"
         }
       ]
-    }
+    },
+    {
+      label: "Khata",
+      icon: <FaBook />,
+      subItems: [
+        {
+          label: "All Khatas",
+          icon: <FaBook />,
+          path: "/dashboard/khata"
+        }
+      ]
+    },
+
   ];
 
   const SidebarContent = ({ isMobile = false }) => (
@@ -210,7 +223,7 @@ function SideBar({ isMobileMenuOpen, setIsMobileMenuOpen }) {
       )}
 
       {/* Mobile Sidebar */}
-      <div className={`lg:hidden fixed top-0 left-0 h-full z-50 transition-transform duration-300 ${
+      <div className={`lg:hidden fixed top-16 left-0 h-[calc(100vh-4rem)] z-50 transition-transform duration-300 ${
         isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <div className="bg-gradient-to-b from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-900 border-r border-slate-200 dark:border-slate-700 h-full sidebar-container shadow-lg">
@@ -219,8 +232,8 @@ function SideBar({ isMobileMenuOpen, setIsMobileMenuOpen }) {
       </div>
 
       {/* Desktop Sidebar */}
-      <div className="hidden lg:block">
-        <div className={`bg-gradient-to-b from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-900 border-r border-slate-200 dark:border-slate-700 h-[calc(100vh-4rem)] transition-all duration-300 shadow-sm ${
+      <div className="hidden lg:block h-full">
+        <div className={`bg-gradient-to-b from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-900 border-r border-slate-200 dark:border-slate-700 h-full transition-all duration-300 shadow-sm ${
           isCollapsed ? 'w-16' : 'w-64'
         }`}>
           <SidebarContent />

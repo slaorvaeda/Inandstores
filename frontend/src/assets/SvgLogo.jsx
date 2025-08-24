@@ -4,8 +4,8 @@ function SvgLogo() {
   return (
     <svg
       className="svg-standalone-icon dark:filter dark:brightness-0 dark:invert"
-      width="auto"
-      height="32px"
+      width="120"
+      height="32"
       viewBox="219.41962933414067 114.99999999999999 111.16074133171867 132.12235485448423"
       style={{ minWidth: '120px' }}
     >

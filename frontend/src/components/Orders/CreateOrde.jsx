@@ -3,6 +3,7 @@ import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { MdDelete } from 'react-icons/md';
+import { API_ENDPOINTS, getAuthHeaders, getApiUrlWithUserId } from '../../config/api';
 
 const CreateOrde = () => {
     const [clients, setClients] = useState([]);
@@ -38,7 +39,7 @@ const CreateOrde = () => {
     useEffect(() => {
         const fetchClients = async () => {
             try {
-                const res = await axios.get('http://localhost:4000/api/clients');
+                const res = await axios.get(API_ENDPOINTS.CLIENTS);
                 setClients(res.data.clients || []);
             } catch (err) {
                 console.error('Error fetching clients:', err);
@@ -53,9 +54,8 @@ const CreateOrde = () => {
                     return;
                 }
 
-                const res = await axios.get(`http://localhost:4000/api/items?userId=${userId}`);
+                const res = await axios.get(getApiUrlWithUserId(API_ENDPOINTS.ITEMS));
                 setItemsList(res.data || []);
-                console.log('Fetched items:', res.data);
             } catch (err) {
                 console.error('Error fetching items:', err.response?.data || err.message);
             }
@@ -71,7 +71,6 @@ const CreateOrde = () => {
 
         watchedItems.forEach((item) => {
             const matchedItem = itemsList.find((i) => i._id === item.item);
-            // console.log('Matched item:', matchedItem);
             if (matchedItem) {
                 const rate = matchedItem?.salesInfo?.sellingPrice || 0;
                 const taxRate = matchedItem?.salesInfo?.taxRate || 18;
@@ -99,7 +98,6 @@ const CreateOrde = () => {
     const onSubmit = async (data) => {
         try {
             const userId = localStorage.getItem('userId');
-            console.log(data);
 
             const transformedItems = data.items.map((entry) => {
                 const matched = itemsList.find((i) => i._id === entry.item);
@@ -134,9 +132,7 @@ const CreateOrde = () => {
                 customerNotes: data.customerNotes,
             };
 
-            console.log("Submitting order:", orderData);
-
-            await axios.post('http://localhost:4000/api/orders/create', orderData);
+            await axios.post(API_ENDPOINTS.ORDER_CREATE, orderData);
 
             alert('Order saved successfully!');
             reset();

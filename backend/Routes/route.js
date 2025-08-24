@@ -4,10 +4,7 @@ const User = require("../Schema/Newuser");
 const router = express.Router();
 const dotenv = require("dotenv");
 const invoiceController = require('../controllers/invoiceController');
-const clientController = require('../controllers/clientController');
 const Invoice = require('../Schema/Invoice.model');
-const userRoutes = require("./userRoutes");
-const Vender = require("../Schema/Vender.model");
 const verifyToken = require("../middleware/auth"); // Middleware to verify JWT
 
 dotenv.config();
@@ -41,8 +38,14 @@ router.post("/signup", async (req, res) => {
       return res.status(400).json({ message: "Email already in use" });
     }
 
-    // ✅ Let schema hash password
-    const newUser = new User({ name, email, password, avatar });
+    // ✅ Let schema hash password and set provider
+    const newUser = new User({ 
+      name, 
+      email, 
+      password, 
+      avatar,
+      provider: 'local'
+    });
     await newUser.save();
 
     res.status(201).json({ message: "User created successfully" });
@@ -66,6 +69,11 @@ router.post("/login", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Check if user is a Google user trying to login with password
+    if (user.provider === 'google' && !user.password) {
+      return res.status(401).json({ message: "This account was created with Google. Please use Google Sign-In." });
+    }
+
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
@@ -85,6 +93,7 @@ router.post("/login", async (req, res) => {
         name: user.name,
         email: user.email,
         avatar: user.avatar,
+        provider: user.provider || 'local'
       },
     });
   } catch (error) {
@@ -115,9 +124,17 @@ router.get("/avatar/:userId", async (req, res) => {
 });
 
 
-router.post('/invoices', invoiceController.createInvoice);
+router.post('/invoices', verifyToken, invoiceController.createInvoice);
 
-router.get('/invoices/:id', async (req, res) => {
+// Get next invoice number
+router.get('/invoices/next-number', verifyToken, invoiceController.getNextInvoiceNumber);
+
+
+
+// Get all invoices - this must come BEFORE /invoices/:id
+router.get('/invoices', verifyToken, invoiceController.getAllInvoices);
+
+router.get('/invoices/:id', verifyToken, async (req, res) => {
   try {
     const invoice = await Invoice.findById(req.params.id).populate('client'); // Replace with your DB query
     if (!invoice) return res.status(404).json({ error: 'Invoice not found' });
@@ -127,8 +144,7 @@ router.get('/invoices/:id', async (req, res) => {
   }
 });
 
-router.get('/invoices', invoiceController.getAllInvoices);
-router.put('/invoices/:id', async (req, res) => {
+router.put('/invoices/:id', verifyToken, async (req, res) => {
   try {
     const updatedInvoice = await Invoice.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!updatedInvoice) return res.status(404).json({ error: 'Invoice not found' });
@@ -139,8 +155,7 @@ router.put('/invoices/:id', async (req, res) => {
   }
 });
 
-
-router.delete('/invoices/:id', async (req, res) => {
+router.delete('/invoices/:id', verifyToken, async (req, res) => {
   try {
     const deletedInvoice = await Invoice.findByIdAndDelete(req.params.id);
 
@@ -152,16 +167,6 @@ router.delete('/invoices/:id', async (req, res) => {
   }
 });
 
-
-router.post('/', clientController.createClient); // Create a new client
-router.get('/clients', clientController.getClients); // Get all clients
-router.get('/clients/:id', clientController.getClientById); // Get a client by ID
-router.put('/clients/:id', clientController.updateClient); // Update a client by ID
-router.delete('/clients/:id', clientController.deleteClient); // Delete a client by ID
-
-
-
-
 router.get('/user/:id', async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select('-password');
@@ -171,7 +176,6 @@ router.get('/user/:id', async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
-
 
 router.put('/user/update/:id', async (req, res) => {
   try {
@@ -194,21 +198,5 @@ router.put('/user/update/:id', async (req, res) => {
     res.status(500).json({ message: 'Update failed', error: err.message });
   }
 });
-
-
-router.put('/:id', async (req, res) => {
-  try {
-    const updatedItem = await Item.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updatedItem) return res.status(404).json({ error: 'Item not found' });
-    res.json(updatedItem);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to update item' });
-  }
-});
-
-
-
-
-
 
 module.exports = router;

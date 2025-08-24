@@ -5,7 +5,10 @@ const PurchaseBillController = require('../controllers/purchaseBillConntroller')
 
 router.use(verifyToken);
 
+
+
 router.post('/create', PurchaseBillController.createPurchaseBill);
+router.get('/next-number', PurchaseBillController.getNextBillNumber);
 router.get('/', PurchaseBillController.getBills);
 router.get('/:id', PurchaseBillController.getBillById);
 router.put('/:id', PurchaseBillController.updateBill);

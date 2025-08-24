@@ -1,6 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const clientController = require('../controllers/clientController');
+const verifyToken = require('../middleware/auth');
+
+// Apply authentication middleware to all routes
+router.use(verifyToken);
+
+
 
 // Route to create a new client
 router.post('/', clientController.createClient);

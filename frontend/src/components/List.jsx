@@ -43,14 +43,14 @@ function List(props) {
     const totalItems = lists.length;
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-800/80 backdrop-blur-sm py-8 rounded-lg">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="mb-8">
                     <div className="flex justify-between items-center">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-900">{heading}</h1>
-                            <p className="mt-2 text-gray-600">Manage your {name.toLowerCase()} records</p>
+                            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{heading}</h1>
+                            <p className="mt-2 text-gray-600 dark:text-white/60">Manage your {name.toLowerCase()} records</p>
                         </div>
                         <button
                             onClick={() => navigate("add")}
@@ -63,38 +63,38 @@ function List(props) {
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="bg-white rounded-lg shadow p-6">
+                    <div className="bg-white dark:bg-slate-700/80 backdrop-blur-sm rounded-lg shadow p-6">
                         <div className="flex items-center">
                             <div className="p-2 bg-blue-100 rounded-lg">
                                 <FaFileInvoice className="w-6 h-6 text-blue-600" />
                             </div>
                             <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-600">Total {name}s</p>
-                                <p className="text-2xl font-bold text-gray-900">{totalItems}</p>
+                                <p className="text-sm font-medium text-gray-600 dark:text-white/60">Total {name}s</p>
+                                <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalItems}</p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow p-6">
+                    <div className="bg-white rounded-lg shadow p-6 dark:bg-slate-700/80 backdrop-blur-sm">
                         <div className="flex items-center">
                             <div className="p-2 bg-green-100 rounded-lg">
                                 <FaRupeeSign className="w-6 h-6 text-green-600" />
                             </div>
                             <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-600">Total Amount</p>
-                                <p className="text-2xl font-bold text-gray-900">₹{totalAmount.toLocaleString()}</p>
+                                <p className="text-sm font-medium text-gray-600 dark:text-white/60">Total Amount</p>
+                                <p className="text-2xl font-bold text-gray-900 dark:text-white">₹{totalAmount.toLocaleString()}</p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow p-6">
+                    <div className="bg-white rounded-lg shadow p-6 dark:bg-slate-700/80 backdrop-blur-sm">
                         <div className="flex items-center">
                             <div className="p-2 bg-purple-100 rounded-lg">
                                 <FaCalendarAlt className="w-6 h-6 text-purple-600" />
                             </div>
                             <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-600">This Month</p>
-                                <p className="text-2xl font-bold text-gray-900">
+                                <p className="text-sm font-medium text-gray-600 dark:text-white/60">This Month</p>
+                                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                                     {lists.filter(item => {
                                         const itemDate = new Date(name === 'Order' ? item.orderDate : item.invoiceDate);
                                         const now = new Date();
@@ -107,9 +107,9 @@ function List(props) {
                 </div>
 
                 {/* Data Table */}
-                <div className="bg-white rounded-lg shadow overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-200">
-                        <h3 className="text-lg font-medium text-gray-900">All {name}s</h3>
+                <div className="bg-white rounded-lg shadow overflow-hidden dark:bg-slate-700/80 backdrop-blur-sm">
+                    <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700/80 backdrop-blur-sm">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-white">All {name}s</h3>
                     </div>
                     
                     {lists.length === 0 ? (
@@ -117,7 +117,7 @@ function List(props) {
                             <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            <h3 className="mt-2 text-sm font-medium text-gray-900">No {name.toLowerCase()}s found</h3>
+                            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No {name.toLowerCase()}s found</h3>
                             <p className="mt-1 text-sm text-gray-500">Get started by creating a new {name.toLowerCase()}.</p>
                             <div className="mt-6">
                                 <button

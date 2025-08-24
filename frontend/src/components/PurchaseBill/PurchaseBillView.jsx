@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, Link } from "react-router-dom";
+import { API_ENDPOINTS, getAuthHeaders } from '../../config/api';
 
 function PurchaseBillView() {
   const { id } = useParams();
@@ -11,8 +12,8 @@ function PurchaseBillView() {
     const fetchBill = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(`http://localhost:4000/api/purchasebills/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
+        const res = await axios.get(API_ENDPOINTS.PURCHASE_BILL_BY_ID(id), {
+          headers: getAuthHeaders(),
         });
         setBill(res.data);
         // console.log(res.data);
@@ -70,8 +71,8 @@ function PurchaseBillView() {
             <tr key={i}>
               <td className="border px-2 py-1">{item.itemName}</td>
               <td className="border px-2 py-1 text-center">{item.quantity}</td>
-              <td className="border px-2 py-1 text-right">{item.unitPrice.toFixed(2)}</td>
-              <td className="border px-2 py-1 text-right">{item.taxRate}%</td>
+              <td className="border px-2 py-1 text-right">{item.rate?.toFixed(2)}</td>
+              <td className="border px-2 py-1 text-right">{item.taxRate ? `${item.taxRate}%` : '-'}</td>
               <td className="border px-2 py-1 text-right">{item.total?.toFixed(2)}</td>
             </tr>
           ))}

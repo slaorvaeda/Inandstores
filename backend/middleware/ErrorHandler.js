@@ -1,5 +1,12 @@
 const ApiError = require("../utils/ApiError")
 
+// Async handler wrapper to catch errors in async functions
+const asyncHandler = (fn) => {
+    return (req, res, next) => {
+        Promise.resolve(fn(req, res, next)).catch(next);
+    };
+};
+
 const ErrorHandling = async(err, req, res, next) => {
     
     const obj = {}
@@ -19,4 +26,4 @@ const ErrorHandling = async(err, req, res, next) => {
 
 }
 
-module.exports = ErrorHandling
+module.exports = { ErrorHandling, asyncHandler }

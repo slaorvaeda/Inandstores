@@ -1,175 +1,292 @@
-import React from 'react';
-import { useForm } from 'react-hook-form';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { FaUser, FaBuilding, FaMapMarkerAlt, FaEnvelope, FaPhone, FaSave, FaTimes, FaFileInvoice } from 'react-icons/fa';
+import { Button, Input, Textarea, Card, LoadingSpinner, Alert } from '../common';
+import { API_ENDPOINTS, getAuthHeaders, getApiUrlWithUserId } from '../../config/api';
 
 const VendorForm = ({ onVendorCreated }) => {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors }
-  } = useForm();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [formData, setFormData] = useState({
+    name: '',
+    company: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    state: '',
+    pincode: '',
+    gstNumber: '',
+    panNumber: '',
+    notes: '',
+  });
 
-  const token = localStorage.getItem('token');
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formData.name.trim()) {
+      newErrors.name = 'Vendor name is required';
+    }
+    
+    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+    
+    if (formData.phone && !/^[\+]?[1-9][\d]{0,15}$/.test(formData.phone.replace(/\s/g, ''))) {
+      newErrors.phone = 'Please enter a valid phone number';
+    }
+    
+    if (formData.gstNumber && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(formData.gstNumber)) {
+      newErrors.gstNumber = 'Please enter a valid GST number';
+    }
+    
+    if (formData.panNumber && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(formData.panNumber)) {
+      newErrors.panNumber = 'Please enter a valid PAN number';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-  const onSubmit = async data => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    
+    // Convert GST and PAN to uppercase
+    let processedValue = value;
+    if (name === 'gstNumber' || name === 'panNumber') {
+      processedValue = value.toUpperCase();
+    }
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+    
+    setFormData(prev => ({
+      ...prev,
+      [name]: processedValue,
+    }));
+  };
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+    
+    setLoading(true);
+    
     try {
-      await axios.post('http://localhost:4000/api/vendors', data, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+      await axios.post(API_ENDPOINTS.VENDORS, formData, {
+        headers: getAuthHeaders()
       });
-      reset();
+      
       alert('Vendor created successfully!');
       if (onVendorCreated) onVendorCreated();
       navigate('/dashboard/vendor');
     } catch (err) {
       console.error('Error creating vendor:', err.response?.data?.message || err.message);
       alert('Error creating vendor. Please try again.');
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleCancel = () => {
+    navigate('/dashboard/vendor');
   };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
-            <h2 className="text-2xl font-bold text-white">Add New Vendor</h2>
-            <p className="text-purple-100 mt-1">Enter vendor details to add them to your system</p>
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Add New Vendor</h1>
+              <p className="mt-2 text-gray-600">Enter vendor details to add them to your system</p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={handleCancel}
+              icon={<FaTimes />}
+            >
+              Cancel
+            </Button>
           </div>
+        </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-8">
-            {/* Basic Information */}
-            <div className="bg-gray-50 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                <span className="w-2 h-2 bg-purple-500 rounded-full mr-3"></span>
-                Basic Information
-              </h3>
+        {/* Form */}
+        <Card>
+          <form onSubmit={onSubmit} className="p-8">
+            {/* Basic Information Section */}
+            <div className="mb-8">
+              <div className="flex items-center mb-6">
+                <div className="p-2 bg-blue-100 rounded-lg mr-3">
+                  <FaUser className="w-5 h-5 text-blue-600" />
+                </div>
+                <h2 className="text-xl font-semibold text-gray-900">Basic Information</h2>
+              </div>
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Vendor Name *</label>
-                  <input
-                    placeholder="Enter vendor name"
-                    {...register('name', { required: 'Vendor name is required' })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                  {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
-                </div>
+                <Input
+                  label="Vendor Name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  placeholder="Enter vendor name"
+                  error={errors.name}
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Company</label>
-                  <input
-                    placeholder="Company name"
-                    {...register('company')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                </div>
+                <Input
+                  label="Company"
+                  name="company"
+                  value={formData.company}
+                  onChange={handleChange}
+                  placeholder="Company name"
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                  <input
-                    type="email"
-                    placeholder="vendor@example.com"
-                    {...register('email')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                </div>
+                <Input
+                  label="Email Address"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="vendor@example.com"
+                  error={errors.email}
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                  <input
-                    placeholder="+91 98765 43210"
-                    {...register('phone')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Address Information */}
-            <div className="bg-gray-50 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
-                Address Information
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                  <textarea
-                    placeholder="Enter complete address"
-                    {...register('address')}
-                    rows="3"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Business Information */}
-            <div className="bg-gray-50 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
-                Business Information
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">GST Number</label>
-                  <input
-                    placeholder="22AAAAA0000A1Z5"
-                    {...register('gstNumber')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">PAN Number</label>
-                  <input
-                    placeholder="ABCDE1234F"
-                    {...register('panNumber')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Additional Information */}
-            <div className="bg-gray-50 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                <span className="w-2 h-2 bg-orange-500 rounded-full mr-3"></span>
-                Additional Information
-              </h3>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
-                <textarea
-                  placeholder="Any additional notes about this vendor..."
-                  {...register('notes')}
-                  rows="4"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                <Input
+                  label="Phone Number"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="+91 98765 43210"
+                  error={errors.phone}
                 />
               </div>
             </div>
 
-            {/* Submit Buttons */}
-            <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
-              <button
-                type="button"
-                onClick={() => navigate('/dashboard/vendor')}
-                className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+            {/* Address Information Section */}
+            <div className="mb-8">
+              <div className="flex items-center mb-6">
+                <div className="p-2 bg-green-100 rounded-lg mr-3">
+                  <FaMapMarkerAlt className="w-5 h-5 text-green-600" />
+                </div>
+                <h2 className="text-xl font-semibold text-gray-900">Address Information</h2>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="md:col-span-2">
+                  <Textarea
+                    label="Address"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    placeholder="Enter complete address"
+                    rows={3}
+                  />
+                </div>
+
+                <Input
+                  label="City"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                  placeholder="Enter city"
+                />
+
+                <Input
+                  label="State"
+                  name="state"
+                  value={formData.state}
+                  onChange={handleChange}
+                  placeholder="Enter state"
+                />
+
+                <Input
+                  label="Pincode"
+                  name="pincode"
+                  value={formData.pincode}
+                  onChange={handleChange}
+                  placeholder="Enter pincode"
+                />
+              </div>
+            </div>
+
+            {/* Business Information Section */}
+            <div className="mb-8">
+              <div className="flex items-center mb-6">
+                <div className="p-2 bg-purple-100 rounded-lg mr-3">
+                  <FaFileInvoice className="w-5 h-5 text-purple-600" />
+                </div>
+                <h2 className="text-xl font-semibold text-gray-900">Business Information</h2>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Input
+                  label="GST Number"
+                  name="gstNumber"
+                  value={formData.gstNumber}
+                  onChange={handleChange}
+                  placeholder="22AAAAA0000A1Z5"
+                  error={errors.gstNumber}
+                />
+
+                <Input
+                  label="PAN Number"
+                  name="panNumber"
+                  value={formData.panNumber}
+                  onChange={handleChange}
+                  placeholder="ABCDE1234F"
+                  error={errors.panNumber}
+                />
+              </div>
+            </div>
+
+            {/* Additional Information Section */}
+            <div className="mb-8">
+              <div className="flex items-center mb-6">
+                <div className="p-2 bg-orange-100 rounded-lg mr-3">
+                  <FaEnvelope className="w-5 h-5 text-orange-600" />
+                </div>
+                <h2 className="text-xl font-semibold text-gray-900">Additional Information</h2>
+              </div>
+              
+              <div>
+                <Textarea
+                  label="Notes"
+                  name="notes"
+                  value={formData.notes}
+                  onChange={handleChange}
+                  placeholder="Any additional notes about this vendor..."
+                  rows={4}
+                />
+              </div>
+            </div>
+
+            {/* Form Actions */}
+            <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+              <Button
+                variant="outline"
+                onClick={handleCancel}
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
-                className="px-6 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors font-medium"
+                loading={loading}
+                icon={<FaSave />}
               >
-                Create Vendor
-              </button>
+                {loading ? 'Creating...' : 'Create Vendor'}
+              </Button>
             </div>
           </form>
-        </div>
+        </Card>
       </div>
     </div>
   );

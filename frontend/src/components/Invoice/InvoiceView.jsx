@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import InvoicePDF from './InvoicePDF';
+import { API_ENDPOINTS, getAuthHeaders, getApiUrlWithUserId } from '../../config/api';
 
 const InvoiceView = () => {
   const [invoice, setInvoice] = useState(null);
@@ -16,7 +17,7 @@ const InvoiceView = () => {
   useEffect(() => {
     const fetchInvoice = async () => {
       try {
-        const response = await axios.get(`http://localhost:4000/invoices/${invoiceId}`);
+        const response = await axios.get(API_ENDPOINTS.INVOICE_BY_ID(invoiceId));
         setInvoice(response.data);
       } catch (err) {
         setError('Failed to fetch invoice details.');
@@ -33,7 +34,7 @@ const InvoiceView = () => {
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this invoice?')) {
       try {
-        await axios.delete(`http://localhost:4000/invoices/${invoiceId}`);
+        await axios.delete(API_ENDPOINTS.INVOICE_BY_ID(invoiceId));
         alert('Invoice deleted.');
         navigate('/invoices');
       } catch {
